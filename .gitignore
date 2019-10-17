@@ -8,7 +8,16 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 
-QCTyche/.vs/
+QCTyche-VS/.vs/
+QCTyche-VS/Debug/
+QCTyche-VS/Release/
+QCTyche-VS/x64/
+QCTyche-VS/QCTyche-VS/Debug/
+QCTyche-VS/QCTyche-VS/Release/
+QCTyche-VS/QCTyche-VS/x64/
+
+
 QCTyche/.idea/
 QCTyche/cmake-build-*/
+QCTyche/.vs/
 QCTyche/out/

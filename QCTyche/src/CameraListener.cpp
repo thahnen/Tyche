@@ -7,15 +7,9 @@
 
 void CameraListener::setLensParameters(const royale::LensParameters& lensParameters) {
     cameraMatrix = (cv::Mat1d(3, 3)
-                        << lensParameters.focalLength.first,
-                            0,
-                            lensParameters.principalPoint.first,
-                            0,
-                            lensParameters.focalLength.second,
-                            lensParameters.principalPoint.second,
-                            0,
-                            0,
-                            1
+                        << lensParameters.focalLength.first, 0, lensParameters.principalPoint.first,
+                            0, lensParameters.focalLength.second, lensParameters.principalPoint.second,
+                            0, 0, 1
                     );
 
     distortionCoefficients = (cv::Mat1d(1, 5)
