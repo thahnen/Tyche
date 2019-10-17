@@ -7,7 +7,54 @@
 
 #include "CameraListener.h"
 
+using namespace std;
+
 
 int main() {
-    std::cout << "Hello World!\n";
+	cout << "Starts running ..." << endl;
+
+
+	CameraListener listener;
+
+	unique_ptr<royale::ICameraDevice> cameraDevice;
+	if (listener.requestCamera(cameraDevice) < 0) {
+		cerr << "No camera detected or receaved nullptr!" << endl
+			<< "Maybe camera is not plugged in, drivers are not installed or missing USB permission!" << endl;
+		
+		return -1;
+	}
+
+
+	if (listener.configureCamera(cameraDevice) < 0) {
+		cerr << "Camera could not be configured!" << endl
+			<< "Maybe initialization failed or setting of lens parameters or exposure mode!" << endl;
+	}
+
+
+	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
+		cerr << "Error registering data listener" << endl;
+		return -5;
+	}
+
+	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
+		cerr << "Error starting the capturing" << endl;
+		return -6;
+	}
+
+
+	for (;;) {
+		cv::imshow("Grayscale", cv::Mat::zeros(cv::Size(100, 100), CV_8UC1));
+
+		// For now break from endless loop only using enter key!
+		if (cv::waitKey(1) == 43) break;
+	}
+
+
+	if (cameraDevice->stopCapture() != royale::CameraStatus::SUCCESS) {
+		cerr << "Error stopping the capturing" << endl;
+		return 7;
+	}
+
+
+	cout << "Stops running ..." << endl;
 }

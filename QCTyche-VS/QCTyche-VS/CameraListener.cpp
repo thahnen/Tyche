@@ -5,23 +5,51 @@
 #include "CameraListener.h"
 
 
-void CameraListener::setLensParameters(const royale::LensParameters& lensParameters) {
-	cameraMatrix = (cv::Mat1d(3, 3)
-		<< lensParameters.focalLength.first, 0, lensParameters.principalPoint.first,
-		0, lensParameters.focalLength.second, lensParameters.principalPoint.second,
-		0, 0, 1
-		);
-
-	distortionCoefficients = (cv::Mat1d(1, 5)
-		<< lensParameters.distortionRadial[0],
-		lensParameters.distortionRadial[1],
-		lensParameters.distortionTangential.first,
-		lensParameters.distortionTangential.second,
-		lensParameters.distortionRadial[2]
-		);
+///	Requests a camera device from the list provided by the camera manager
+int CameraListener::requestCamera(std::unique_ptr<royale::ICameraDevice>& device) {
+	return requestSpecificCamera(device, 0);
 }
 
 
+///	Requests a specific camera device from the provided list
+int CameraListener::requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem) {
+	royale::CameraManager manager;
+	royale::Vector<royale::String> camlist(manager.getConnectedCameraList());
+
+	if (camlist.empty())
+		return 1;
+
+	if (lstitem >= camlist.size())
+		return 2;
+
+	device = manager.createCamera(camlist[lstitem]);
+	if (device == nullptr)
+		return 3;
+
+	camlist.clear();
+	return 0;
+}
+
+
+/// Configures the camera for capturing frames
+int CameraListener::configureCamera(std::unique_ptr<royale::ICameraDevice>& device) {
+	if (device->initialize() != royale::CameraStatus::SUCCESS)
+		return 1;
+
+	royale::LensParameters lensParameters;
+	if (device->getLensParameters(lensParameters) != royale::CameraStatus::SUCCESS)
+		return 2;
+
+	setLensParameters(lensParameters);
+
+	if (device->setExposureMode(royale::ExposureMode::AUTOMATIC) != royale::CameraStatus::SUCCESS)
+		return 3;
+
+	return 0;
+}
+
+
+/// Handler executed when receiving new data from camera (every frame)
 void CameraListener::onNewData(const royale::DepthData* data) {
 	std::lock_guard<std::mutex> lock(flagMutex);
 
@@ -50,4 +78,36 @@ void CameraListener::onNewData(const royale::DepthData* data) {
 
 	temp = grayImage.clone();
 	cv::undistort(temp, grayImage, cameraMatrix, distortionCoefficients);
+}
+
+
+/// Returns the newest depth image converted to given type
+// TODO: implement
+cv::Mat CameraListener::getNewestDepthImage(int type) {
+	return getNewestDepthImage();
+}
+
+
+/// Returns the newest grayscale image converted to given type
+// TODO: implement
+cv::Mat CameraListener::getNewestGrayscaleImage(int type) {
+	return getNewestGrayscaleImage();
+}
+
+
+/// Sets the lens parameters of the camera
+void CameraListener::setLensParameters(const royale::LensParameters& lensParameters) {
+	cameraMatrix = (cv::Mat1d(3, 3)
+		<< lensParameters.focalLength.first, 0, lensParameters.principalPoint.first,
+			0, lensParameters.focalLength.second, lensParameters.principalPoint.second,
+			0, 0, 1
+		);
+
+	distortionCoefficients = (cv::Mat1d(1, 5)
+		<< lensParameters.distortionRadial[0],
+			lensParameters.distortionRadial[1],
+			lensParameters.distortionTangential.first,
+			lensParameters.distortionTangential.second,
+			lensParameters.distortionRadial[2]
+		);
 }
