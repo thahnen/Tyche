@@ -84,14 +84,54 @@ void CameraListener::onNewData(const royale::DepthData* data) {
 /// Returns the newest depth image converted to given type
 // TODO: implement
 cv::Mat CameraListener::getNewestDepthImage(int type) {
-	return getNewestDepthImage();
+	// Kontrastspreitzung
+	cv::Mat mask;
+	cv::compare(depthImage, 0, mask, cv::CMP_GT);
+	double min, max, scale;
+	cv::minMaxLoc(depthImage, &min, &max, 0, 0, mask);
+
+	cv::Mat conv;
+
+	switch (type) {
+	case CV_8UC1:
+		conv = cv::Mat::zeros(depthImage.rows, depthImage.cols, CV_8UC1);
+
+		// Skalierung
+		scale = 255 / (min - max);
+		cv::convertScaleAbs(depthImage, conv, scale, (-min * scale));
+		break;
+	default:
+		std::cerr << "[CameraListener::getNewestDepthImage] Given type: '" << type << "' not allowed!" << std::endl;
+	}
+
+	return conv;
 }
 
 
 /// Returns the newest grayscale image converted to given type
 // TODO: implement
 cv::Mat CameraListener::getNewestGrayscaleImage(int type) {
-	return getNewestGrayscaleImage();
+	// Kontrastspreitzung
+	cv::Mat mask;
+	cv::compare(grayImage, 0, mask, cv::CMP_GT);
+	double min, max, scale;
+	cv::minMaxLoc(grayImage, &min, &max, 0, 0, mask);
+
+	cv::Mat conv;
+
+	switch (type) {
+	case CV_8UC1:
+		conv = cv::Mat::zeros(grayImage.rows, grayImage.cols, CV_8UC1);
+
+		// Skalierung
+		scale = 255 / (max - min);
+		cv::convertScaleAbs(grayImage, conv, scale);
+		break;
+	default:
+		std::cerr << "[CameraListener::getNewestGrayscaleImage] Given type: '" << type << "' not allowed!" << std::endl;
+	}
+	
+	return conv;
 }
 
 

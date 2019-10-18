@@ -2,8 +2,12 @@
 //
 
 #include <iostream>
+#include <Windows.h>
 #include <opencv2/opencv.hpp>
 #include <royale.hpp>
+
+#define CVUI_IMPLEMENTATION
+#include "cvui.h"
 
 #include "CameraListener.h"
 
@@ -41,9 +45,16 @@ int main() {
 		return -6;
 	}
 
+	/// Test sleeping!
+	Sleep(1000);
+
 
 	for (;;) {
-		cv::imshow("Grayscale", cv::Mat::zeros(cv::Size(100, 100), CV_8UC1));
+		cv::Mat current_grayscale = listener.getNewestGrayscaleImage(CV_8UC1);
+		cv::Mat current_depth = listener.getNewestDepthImage(CV_8UC1);
+
+		cv::imshow("Grayscale", current_grayscale);
+		cv::imshow("Depth", current_depth);
 
 		// For now break from endless loop only using enter key!
 		if (cv::waitKey(1) == 43) break;

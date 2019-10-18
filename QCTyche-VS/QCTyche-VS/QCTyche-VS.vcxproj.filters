@@ -26,5 +26,8 @@
     <ClInclude Include="CameraListener.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="cvui.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
