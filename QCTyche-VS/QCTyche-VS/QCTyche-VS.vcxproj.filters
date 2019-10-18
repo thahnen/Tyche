@@ -35,5 +35,8 @@
     <ClInclude Include="ui.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="SystemHandler.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

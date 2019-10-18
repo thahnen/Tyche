@@ -5,6 +5,8 @@
 #include "CameraListener.h"
 
 #define WINDOW_NAME		"QCTyche"
+#define WINDOW_WIDTH	640
+#define WINDOW_HEIGHT	480
 
 
 class ui {

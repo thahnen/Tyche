@@ -7,7 +7,6 @@
 #include <royale.hpp>
 
 #define CVUI_IMPLEMENTATION
-#include "cvui.h"
 
 #include "CameraListener.h"
 
@@ -21,7 +20,8 @@ int main() {
 	CameraListener listener;
 
 	unique_ptr<royale::ICameraDevice> cameraDevice;
-	if (listener.requestCamera(cameraDevice) < 0) {
+	if (listener.requestCamera(cameraDevice) != 0) {
+		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "No camera detected or receaved nullptr!" << endl
 			<< "Maybe camera is not plugged in, drivers are not installed or missing USB permission!" << endl;
 		
@@ -29,18 +29,21 @@ int main() {
 	}
 
 
-	if (listener.configureCamera(cameraDevice) < 0) {
+	if (listener.configureCamera(cameraDevice) != 0) {
+		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "Camera could not be configured!" << endl
 			<< "Maybe initialization failed or setting of lens parameters or exposure mode!" << endl;
 	}
 
 
 	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
+		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "Error registering data listener" << endl;
 		return -5;
 	}
 
 	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
+		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "Error starting the capturing" << endl;
 		return -6;
 	}
