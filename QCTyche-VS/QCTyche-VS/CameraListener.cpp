@@ -33,6 +33,7 @@ int CameraListener::requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>
 
 /// Configures the camera for capturing frames
 int CameraListener::configureCamera(std::unique_ptr<royale::ICameraDevice>& device) {
+	// TODO: try-catch darum, wenn Kamera nicht angeschlossen!
 	if (device->initialize() != royale::CameraStatus::SUCCESS)
 		return 1;
 
