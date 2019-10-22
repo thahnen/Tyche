@@ -17,7 +17,7 @@ TSTATUS checkResolutionRequirements(int ui_width, int ui_height) {
 	// TODO: testen, ob es mehr als einen Bildschirm gibt, so wird nur der Hauptbildschirm überprüft!
 	RECT screen;
 
-	if (SystemParametersInfo(SPI_GETWORKAREA, 0, &screen, 0) != 0) {
+	if (SystemParametersInfo(SPI_GETWORKAREA, 0, &screen, 0) == 0) {
 		// Es gab einen Fehler beim einlesen der nutzbaren Bildschirmgroesse des Hauptbildschirms!
 		return SH_GETWORKAREA;
 	}

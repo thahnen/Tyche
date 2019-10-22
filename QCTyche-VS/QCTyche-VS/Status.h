@@ -17,4 +17,6 @@ typedef enum {
 	CL_LENS_PARAM,			// CameraListener: can not get camera lens parameters
 	CL_EXPOSURE_MODE,		// CameraListener: can not set camera exposure mode
 
+	UI_FILESAVEDIALOG,		// UI: could not get path for saving the file (using Windows Common Item Dialog)
+
 } TSTATUS;

@@ -55,6 +55,7 @@
  Licensed under the MIT license.
 */
 
+#pragma once
 #ifndef _CVUI_H_
 #define _CVUI_H_
 
