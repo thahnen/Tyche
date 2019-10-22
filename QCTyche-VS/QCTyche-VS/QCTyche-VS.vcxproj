@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="CameraListener.h" />
     <ClInclude Include="cvui.h" />
+    <ClInclude Include="Status.h" />
     <ClInclude Include="SystemHandler.h" />
     <ClInclude Include="ui.h" />
   </ItemGroup>

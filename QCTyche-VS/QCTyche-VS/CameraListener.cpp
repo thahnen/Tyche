@@ -6,52 +6,52 @@
 
 
 ///	Requests a camera device from the list provided by the camera manager
-int CameraListener::requestCamera(std::unique_ptr<royale::ICameraDevice>& device) {
+TSTATUS CameraListener::requestCamera(std::unique_ptr<royale::ICameraDevice>& device) {
 	return requestSpecificCamera(device, 0);
 }
 
 
 ///	Requests a specific camera device from the provided list
-int CameraListener::requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem) {
+TSTATUS CameraListener::requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem) {
 	royale::CameraManager manager;
 	royale::Vector<royale::String> camlist(manager.getConnectedCameraList());
 
 	if (camlist.empty())
-		return 1;
+		return CL_LIST_EMPTY;
 
 	if (lstitem >= camlist.size())
-		return 2;
+		return CL_LIST_OOB;
 
 	device = manager.createCamera(camlist[lstitem]);
 	if (device == nullptr)
-		return 3;
+		return CL_LIST_NULLPTR;
 
 	camlist.clear();
-	return 0;
+	return SUCCESS;
 }
 
 
 /// Configures the camera for capturing frames
-int CameraListener::configureCamera(std::unique_ptr<royale::ICameraDevice>& device) {
+TSTATUS CameraListener::configureCamera(std::unique_ptr<royale::ICameraDevice>& device) {
 	// TODO: try-catch darum, wenn Kamera nicht angeschlossen!
 	try {
 		if (device->initialize() != royale::CameraStatus::SUCCESS)
-			return 1;
+			return CL_CAMERA_INIT;
 	} catch (const std::exception&) {
 		// Lesezugriffsverletzung, weil Kamera nicht angeschlossen war!
-		return 2;
+		return CL_CAMERA_INIT_RAV;
 	}
 
 	royale::LensParameters lensParameters;
 	if (device->getLensParameters(lensParameters) != royale::CameraStatus::SUCCESS)
-		return 3;
+		return CL_LENS_PARAM;
 
 	setLensParameters(lensParameters);
 
 	if (device->setExposureMode(royale::ExposureMode::AUTOMATIC) != royale::CameraStatus::SUCCESS)
-		return 4;
+		return CL_EXPOSURE_MODE;
 
-	return 0;
+	return SUCCESS;
 }
 
 

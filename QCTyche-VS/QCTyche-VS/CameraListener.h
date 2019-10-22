@@ -8,6 +8,8 @@
 #include <royale.hpp>
 #include <opencv2/opencv.hpp>
 
+#include "Status.h"
+
 
 class CameraListener : public royale::IDepthDataListener {
 public:
@@ -15,8 +17,9 @@ public:
 	 *	Requests a camera device from the list provided by the camera manager
 	 *
 	 *	@param device			where the camera should be stored
+	 *	@return					SUCCESS if the resolution matches the requirements otherwise an error
 	 */
-	int requestCamera(std::unique_ptr<royale::ICameraDevice>& device);
+	TSTATUS requestCamera(std::unique_ptr<royale::ICameraDevice>& device);
 
 
 	/**
@@ -24,16 +27,18 @@ public:
 	 *
 	 *	@param device			where the camera should be stored
 	 *	@param lstitem			which camera should be used, starting with 0
+	 *	@return					SUCCESS if the resolution matches the requirements otherwise an error
 	 */
-	int requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem);
+	TSTATUS requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem);
 
 
 	/**
 	 *	Configures the camera for capturing frames
 	 *
 	 *	@param device			which camera should be configured
+	 *	@return					SUCCESS if the resolution matches the requirements otherwise an error
 	 */
-	int configureCamera(std::unique_ptr<royale::ICameraDevice>& device);
+	TSTATUS configureCamera(std::unique_ptr<royale::ICameraDevice>& device);
 
 
 	/**

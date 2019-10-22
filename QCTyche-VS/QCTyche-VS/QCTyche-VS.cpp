@@ -20,7 +20,7 @@ int main() {
 	CameraListener listener;
 
 	unique_ptr<royale::ICameraDevice> cameraDevice;
-	if (listener.requestCamera(cameraDevice) != 0) {
+	if (listener.requestCamera(cameraDevice) != SUCCESS) {
 		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "No camera detected or receaved nullptr!" << endl
 			<< "Maybe camera is not plugged in, drivers are not installed or missing USB permission!" << endl;
@@ -29,7 +29,7 @@ int main() {
 	}
 
 
-	if (listener.configureCamera(cameraDevice) != 0) {
+	if (listener.configureCamera(cameraDevice) != SUCCESS) {
 		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "Camera could not be configured!" << endl
 			<< "Maybe initialization failed or setting of lens parameters or exposure mode!" << endl;
