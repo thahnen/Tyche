@@ -14,7 +14,7 @@
  *	@return						SUCCESS if the resolution matches the requirements otherwise an error
  */
 TSTATUS checkResolutionRequirements(int ui_width, int ui_height) {
-	// TODO: testen, ob es mehr als einen Bildschirm gibt, so wird nur der Hauptbildschirm überprüft!
+	// TODO: testen, ob es mehr als einen Bildschirm gibt, so wird nur der Hauptbildschirm ueberprueft!
 	RECT screen;
 
 	if (SystemParametersInfo(SPI_GETWORKAREA, 0, &screen, 0) == 0) {
@@ -23,18 +23,18 @@ TSTATUS checkResolutionRequirements(int ui_width, int ui_height) {
 	}
 
 	if (screen.right < ui_width) {
-		// Bildschirm zu klein (Breite) für die UI!
+		// Bildschirm zu klein (Breite) fuer die UI!
 		return SH_SMALL_WIDTH;
 	}
 
 	if (screen.bottom < ui_height) {
-		// Bildschirm zu klein (Höhe) für die UI, ggf im Vollbild mit Platz der Taskbar?
+		// Bildschirm zu klein (Hoehe) fuer die UI, ggf im Vollbild mit Platz der Taskbar?
 
 		if (GetSystemMetrics(SM_CYMAXIMIZED) < ui_height) {
-			// Bildschirm zu klein (Höhe) ohne Taskbar
+			// Bildschirm zu klein (Hoehe) ohne Taskbar
 			return SH_SMALL_HEIGHT;
 		} else {
-			// Bildschirm zu klein (Höhe) mit Taskbar
+			// Bildschirm zu klein (Hoehe) mit Taskbar
 			return SH_SMALL_HEIGHT_TB;
 		}
 	}

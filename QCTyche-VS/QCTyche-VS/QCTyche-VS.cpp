@@ -28,7 +28,9 @@ int main() {
 
 	cout << "Test system on functionality!" << endl;
 	if ((stat = checkResolutionRequirements(WINDOW_WIDTH, WINDOW_HEIGHT)) != SUCCESS) {
-		cout << "The resolution requirements of " << WINDOW_WIDTH << "x" << WINDOW_HEIGHT << " could not be matched!" << endl;
+		cout << "The resolution requirements of "
+				<< WINDOW_WIDTH << "x" << WINDOW_HEIGHT
+				<< " could not be matched!" << endl;
 		cout << "Status: " << stat << endl;
 		return -1;
 	}
@@ -41,7 +43,7 @@ int main() {
 		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
 		cerr << "No camera detected or receaved nullptr!" << endl
 			<< "Maybe camera is not plugged in, drivers are not installed or missing USB permission!" << endl;
-		
+
 		return -1;
 	}
 
@@ -89,18 +91,6 @@ int main() {
 			cout << "Mouse clicked -> x:" << cursor.x << " y:" << cursor.y << endl;
 
 			handleMouseInput(cursor.x, cursor.y);
-
-			/*
-			int msgboxid = MessageBox(
-				NULL,
-				L"You sure u want to quit?",
-				L"Confirm quitting!",
-				MB_ICONEXCLAMATION | MB_YESNO
-			);
-
-			if (msgboxid == IDYES) {
-				break;
-			}*/
 		}
 
 
@@ -134,7 +124,16 @@ TSTATUS startUI(cv::Mat& window) {
 
 	// Set UI elements
 	// 1) Save button
-	cvui::button(window, BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_WIDTH, BTN_SAVE_HEIGHT, BTN_SAVE_TEXT);
+	cvui::button(
+		window, BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_WIDTH, BTN_SAVE_HEIGHT, BTN_SAVE_TEXT
+	);
+
+	// 2) Change preview button (from depth to grayscale and vise versa)
+	cvui::button(
+		window, BTN_PRE_X, BTN_PRE_Y, BTN_PRE_WIDTH, BTN_PRE_HEIGHT, BTN_PRE_TEXT
+	);
+
+	// 3) Preview of camera
 
 	return SUCCESS;
 }

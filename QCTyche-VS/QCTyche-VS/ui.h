@@ -17,6 +17,15 @@
 #define BTN_SAVE_X			10
 #define BTN_SAVE_Y			10
 
+#define BTN_PRE_TEXT		"Change Preview"
+#define BTN_PRE_WIDTH		150
+#define BTN_PRE_HEIGHT		30
+#define BTN_PRE_X			100
+#define BTN_PRE_Y			100
+
+
+#define DEFAULT_PATH		"C:\"
+
 
 /**
  *	Requests a path to save the image at from the user
@@ -28,7 +37,10 @@ TSTATUS getFileSavePath(std::string& file_path) {
 	IFileSaveDialog* fsd;
 
 	// Create FileOpenDialog
-	HRESULT res = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&fsd));
+	HRESULT res = CoCreateInstance(
+		CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog,
+		reinterpret_cast<void**>(&fsd)
+	);
 
 	if (SUCCEEDED(res)) {
 		// Set title
@@ -69,6 +81,16 @@ TSTATUS getFileSavePath(std::string& file_path) {
 	// Return non-specific error if requesing save path fails!
 	return UI_FILESAVEDIALOG;
 }
+
+
+/**
+ *	Requests the users home directory as alternative to personally set path!
+ *
+ *	@param file_path		where to store the path
+ *	@return					SUCCESS if the resolution matches the requirements otherwise an error
+ */
+TSTATUS getUserDirectory(std::string& file_path) {}
+
 
 
 /**
