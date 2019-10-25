@@ -17,6 +17,11 @@
 using namespace std;
 
 
+/**
+ *	Starts the user interface once and for all (update done in loop)
+ *
+ *	@param window			the user interface window
+ */
 TSTATUS startUI(cv::Mat& window);
 
 
@@ -28,10 +33,8 @@ int main() {
 
 	cout << "Test system on functionality!" << endl;
 	if ((stat = checkResolutionRequirements(WINDOW_WIDTH, WINDOW_HEIGHT)) != SUCCESS) {
-		cout << "The resolution requirements of "
-				<< WINDOW_WIDTH << "x" << WINDOW_HEIGHT
-				<< " could not be matched!" << endl;
-		cout << "Status: " << stat << endl;
+		// TODO: maybe create resolvable error?
+		handleTSTATUS(stat);
 		return -1;
 	}
 
@@ -39,32 +42,29 @@ int main() {
 	CameraListener listener;
 
 	unique_ptr<royale::ICameraDevice> cameraDevice;
-	if (listener.requestCamera(cameraDevice) != SUCCESS) {
-		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
-		cerr << "No camera detected or receaved nullptr!" << endl
-			<< "Maybe camera is not plugged in, drivers are not installed or missing USB permission!" << endl;
-
-		return -1;
+	while ((stat = listener.requestCamera(cameraDevice)) != SUCCESS) {
+		// Wait until camera is plugged in or cancel is pressed (error can be recovered!)
+		if (!handleTSTATUS(stat)) return -2;
 	}
 
 
-	if (listener.configureCamera(cameraDevice) != SUCCESS) {
-		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
-		cerr << "Camera could not be configured!" << endl
-			<< "Maybe initialization failed or setting of lens parameters or exposure mode!" << endl;
+	if ((stat = listener.configureCamera(cameraDevice)) != SUCCESS) {
+		// Camera settings can not be configured (error can not be recovered!)
+		handleTSTATUS(stat);
+		return -3;
 	}
 
 
 	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
-		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
-		cerr << "Error registering data listener" << endl;
-		return -5;
+		// Camera can not register listener to get images (error can not be recovered!)
+		handleTSTATUS(CD_REGISTER_LIST);
+		return -4;
 	}
 
 	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
-		// TODO: Fehler auswerten (am besten im Listener gespeichert) und ggf mit einfacher GUI reagieren!
-		cerr << "Error starting the capturing" << endl;
-		return -6;
+		// Camera can not start recording video (error can not be recovered!)
+		handleTSTATUS(CD_START_CAPTURE);
+		return -5;
 	}
 
 	/// Test sleeping!
@@ -105,8 +105,8 @@ int main() {
 
 
 	if (cameraDevice->stopCapture() != royale::CameraStatus::SUCCESS) {
-		cerr << "Error stopping the capturing" << endl;
-		return 7;
+		// Camera can not stop recording images (not harmful as this happens at the end!)
+		handleTSTATUS(CD_STOP_CAPTURE);
 	}
 
 

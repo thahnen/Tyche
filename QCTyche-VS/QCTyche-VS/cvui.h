@@ -1820,7 +1820,7 @@ namespace cvui {
 			// Update the layout flow according to button size
 			// if we were told to update.
 			if (theUpdateLayout) {
-				updateLayoutFlow(theBlock, cv::Size(theWidth, theHeight))
+				updateLayoutFlow(theBlock, cv::Size(theWidth, theHeight));
 			}
 
 			bool aWasShortcutPressed = false;

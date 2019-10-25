@@ -24,7 +24,7 @@
 #define BTN_PRE_Y			100
 
 
-#define DEFAULT_PATH		"C:\"
+#define DEFAULT_PATH		"C:\\"
 
 
 /**
@@ -89,7 +89,9 @@ TSTATUS getFileSavePath(std::string& file_path) {
  *	@param file_path		where to store the path
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  */
-TSTATUS getUserDirectory(std::string& file_path) {}
+TSTATUS getUserDirectory(std::string& file_path) {
+	return SUCCESS;
+}
 
 
 
