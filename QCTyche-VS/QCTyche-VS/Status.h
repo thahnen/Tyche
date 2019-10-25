@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Windows.h>
-
 
 typedef enum {
 	SUCCESS = 0,			// Success on requested function

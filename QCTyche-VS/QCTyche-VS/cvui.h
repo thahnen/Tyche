@@ -2510,7 +2510,8 @@ namespace cvui {
 	void watch(const cv::String& theWindowName, bool theCreateNamedWindow) {
 		cvui_context_t aContex;
 
-		if (theCreateNamedWindow)	cv::namedWindow(theWindowName);
+		// Changed to use cv::WINDOW_AUTOSIZE so window does not resize (does not work yet)
+		if (theCreateNamedWindow)	cv::namedWindow(theWindowName, cv::WINDOW_AUTOSIZE);
 
 		aContex.windowName = theWindowName;
 		aContex.mouse.position.x = 0;

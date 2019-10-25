@@ -11,17 +11,40 @@
 #define WINDOW_WIDTH		640
 #define WINDOW_HEIGHT		480
 
-#define BTN_SAVE_TEXT		"Speichern"
-#define BTN_SAVE_WIDTH		75
+#define BTN_SAVE_TEXT		"Save image to file"
+#define BTN_SAVE_WIDTH		140
 #define BTN_SAVE_HEIGHT		30
-#define BTN_SAVE_X			10
-#define BTN_SAVE_Y			10
+#define BTN_SAVE_X			250
+#define BTN_SAVE_Y			380
 
 #define BTN_PRE_TEXT		"Change Preview"
-#define BTN_PRE_WIDTH		150
+#define BTN_PRE_WIDTH		140
 #define BTN_PRE_HEIGHT		30
-#define BTN_PRE_X			100
-#define BTN_PRE_Y			100
+#define BTN_PRE_X			250
+#define BTN_PRE_Y			420
+
+#define BTN_START_TEXT		"Start"
+#define BTN_START_WIDTH		70
+#define BTN_START_HEIGHT	30
+#define BTN_START_X			150
+#define BTN_START_Y			380
+
+#define BTN_STOP_TEXT		"Stop"
+#define BTN_STOP_WIDTH		70
+#define BTN_STOP_HEIGHT		30
+#define BTN_STOP_X			150
+#define BTN_STOP_Y			420
+
+#define BTN_QUIT_TEXT		"Quit"
+#define BTN_QUIT_WIDTH		70
+#define BTN_QUIT_HEIGHT		30
+#define BTN_QUIT_X			420
+#define BTN_QUIT_Y			400
+
+#define IMG_WIDTH			448
+#define IMG_HEIGHT			342
+#define IMG_X				96
+#define IMG_Y				20
 
 
 #define DEFAULT_PATH		"C:\\"
@@ -106,6 +129,11 @@ TSTATUS getUserDirectory(std::string& file_path) {
  */
 TSTATUS handleMouseInput(int x, int y) {
 	std::string path;
+
+	if (x >= BTN_QUIT_X && x <= BTN_QUIT_X + BTN_QUIT_WIDTH && y >= BTN_QUIT_Y && y <= BTN_QUIT_Y + BTN_QUIT_HEIGHT) {
+		// Quit gedrückt! (noch eigenen "Fehler ausdenken)
+		return CD_REGISTER_LIST;
+	}
 
 	return getFileSavePath(path);
 }

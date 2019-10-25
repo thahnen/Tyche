@@ -1,3 +1,5 @@
+#include <Windows.h>
+
 #include "Status.h"
 
 
@@ -83,6 +85,9 @@ bool handleTSTATUS(TSTATUS error) {
 		break;
 	}
 
+	// Make a noise to get attention!
+	MessageBeep(MB_ICONERROR);
+
 	// Show error dialog!
 	int msgboxid = MessageBox(
 		NULL,
@@ -90,9 +95,6 @@ bool handleTSTATUS(TSTATUS error) {
 		L"An error occured!",
 		msgbox_type
 	);
-
-	// Make a noise to get attention!
-	MessageBeep(MB_ICONERROR);
 
 	// When error is recoverable but user wants to exit anyways
 	if (recover && msgboxid == IDCANCEL)	recover = false;
