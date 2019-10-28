@@ -21,8 +21,11 @@ typedef enum {
 	CD_START_CAPTURE,		// CameraDevice: camera can not start capturing
 	CD_STOP_CAPTURE,		// CameraDevice: camera can not stop capturing
 
+	UI_SETUP,				// UI: could not set up the UI (cvui.h may be a bit buggy sometimes)
+	UI_QUIT,				// UI: user pressed "Quit" button to quit the application!
 	UI_FILESAVEDIALOG,		// UI: could not get path for saving the file (using Windows Common Item Dialog)
 	UI_HOME_DIRECTORY,		// UI: could not get users home directory
+	UI_SAVE_IMAGE,			// UI: could not save image to path
 } TSTATUS;
 
 

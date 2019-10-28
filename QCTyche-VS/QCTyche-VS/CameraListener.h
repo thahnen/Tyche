@@ -18,6 +18,8 @@ public:
 	 *
 	 *	@param device			where the camera should be stored
 	 *	@return					SUCCESS if the resolution matches the requirements otherwise an error
+	 *
+	 *	TODO: see requestSpecificCamera function!
 	 */
 	TSTATUS requestCamera(std::unique_ptr<royale::ICameraDevice>& device);
 
@@ -28,6 +30,9 @@ public:
 	 *	@param device			where the camera should be stored
 	 *	@param lstitem			which camera should be used, starting with 0
 	 *	@return					SUCCESS if the resolution matches the requirements otherwise an error
+	 *	
+	 *	TODO: inform the user if more than one camera is connected, maybe give him a selection!
+	 *	TODO: maybe preview an image to let the user select?
 	 */
 	TSTATUS requestSpecificCamera(std::unique_ptr<royale::ICameraDevice>& device, int lstitem);
 

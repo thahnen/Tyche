@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <chrono>
 #include <Windows.h>
 #include <opencv2/opencv.hpp>
 #include <royale.hpp>
@@ -24,73 +25,104 @@ TSTATUS startUI(cv::Mat& window);
 
 /**
  *	Main program running
- *
+ *	=> no possible command line arguments yet, may change in the future!
  */
 int main(int argc, char** argv) {
-	cout << "Starts running ..." << endl;
-
+	/// Status variable used throughout the program to handle return states
 	TSTATUS stat;
 
 
+	///	Check the system requirements (monitor resolution, ...)
+	///
 	cout << "Test system on functionality!" << endl;
 	if ((stat = checkResolutionRequirements(WINDOW_WIDTH, WINDOW_HEIGHT)) != SUCCESS) {
 		// TODO: maybe create resolvable error?
 		handleTSTATUS(stat);
-		return -1;
+		return 1;
 	}
 
 
+	///	The window variable which holds the primitive GUI
 	cv::Mat window;
-	startUI(window);
 
-	// Minimizes the console running this program!
-	ShowWindow(GetConsoleWindow(), SW_MINIMIZE);
 
+	///	Try to start the gui before minimizing the console window which is only used for logging!
+	///
+	if ((stat = startUI(window)) != SUCCESS) {
+		handleTSTATUS(stat);
+		return 2;
+	}
 	cvui::update();
-
 	cvui::imshow(WINDOW_NAME, window);
 
+	ShowWindow(GetConsoleWindow(), SW_MINIMIZE);
 
+
+	/// Camera listener used for setting up the camera and handling the input every frame
+	/// The camera device which is representing the camera
 	CameraListener listener;
-
 	unique_ptr<royale::ICameraDevice> cameraDevice;
+
+
+	///	Try to request a camera until one is plugged in or the user cancels the application
+	///
 	while ((stat = listener.requestCamera(cameraDevice)) != SUCCESS) {
 		// Wait until camera is plugged in or cancel is pressed (error can be recovered!)
-		if (!handleTSTATUS(stat)) return -2;
+		if (!handleTSTATUS(stat)) return 3;
 	}
 
 
+	///	Try to configure the camera by setting lens parameters and exposure mode
+	///
 	if ((stat = listener.configureCamera(cameraDevice)) != SUCCESS) {
 		// Camera settings can not be configured (error can not be recovered!)
 		handleTSTATUS(stat);
-		return -3;
+		return 4;
 	}
 
 
+	///	Try to register our camera listener to the specific device!
+	///
 	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
 		// Camera can not register listener to get images (error can not be recovered!)
 		handleTSTATUS(CD_REGISTER_LIST);
-		return -4;
+		return 5;
 	}
 
+
+	///	Try to start capturing images using the camera
+	///
 	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not start recording video (error can not be recovered!)
 		handleTSTATUS(CD_START_CAPTURE);
-		return -5;
+		return 6;
 	}
+
 
 	/// Sleeping for camera to capture first images before requesting one!
 	Sleep(1000);
 
-	/// Camera image for access over more than one loop
+
+	/// Camera image for access over more than one loop (this is resized, we also need the non-resized version!)
+	/// Variable indicating which image is displayed (grayscale or depth)
+	/// Variable indicating if image "capturing" is stopped
 	cv::Mat current_image;
-
-	/// Which image is displayed (grayscale or depth)
 	bool displayDepth = true;
-
-	/// Image "capturing" is stopped
 	bool captureNew = true;
 
+
+	/// To measure the time difference in which the preview image has to be refreshed
+	/// Variable holds the last time the image was refreshed
+	auto last = std::chrono::steady_clock::now();
+	uint16_t fps;
+	if (cameraDevice->getFrameRate(fps) != royale::CameraStatus::SUCCESS) {
+		// Can not get camera frame rate, just set to 30 fps
+		fps = 30;
+	}
+
+
+	///	The main loop of the program (which runs until the user pressed the "Quit" button)
+	///
 	for (;;) {
 		cv::Point cursor = cvui::mouse(WINDOW_NAME);
 
@@ -98,29 +130,50 @@ int main(int argc, char** argv) {
 		if (cvui::mouse(cvui::DOWN)) {
 			cout << "Mouse clicked -> x:" << cursor.x << " y:" << cursor.y << endl;
 
-			if (handleMouseInput(cursor.x, cursor.y, &displayDepth, &captureNew, &current_image) != SUCCESS) break;
+			if ((stat = handleMouseInput(cursor.x, cursor.y, &displayDepth, &captureNew, &current_image)) == UI_QUIT) {
+				break;
+			}
+
+			if (stat != SUCCESS) {
+				handleTSTATUS(stat);
+			}
 		}
 
-		// Update preview window
-		cv::Mat current_depth = listener.getNewestDepthImage(CV_8UC1);
-		cv::resize(current_depth, current_depth, cv::Size(current_depth.cols * 2, current_depth.rows * 2), 0, 0, cv::INTER_LINEAR);
-		cv::cvtColor(current_depth, current_depth, cv::COLOR_GRAY2BGR);
+		// Check if the time of the last image update is bigger than the cameras frame rate
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(
+				std::chrono::steady_clock::now() - last
+			).count() >= (long long)std::floor(1000 / fps)) {
+			// Request new image (if "capturing" not stopped)
+			if (captureNew) {
+				// Which image should be requested?
+				if (displayDepth)	current_image = listener.getNewestDepthImage(CV_8UC1);
+				else				current_image = listener.getNewestGrayscaleImage(CV_8UC1);
 
-		cvui::image(
-			window, IMG_X, IMG_Y, current_depth
-		);
+				cv::resize(current_image, current_image, cv::Size(current_image.cols * 2, current_image.rows * 2), 0, 0, cv::INTER_LINEAR);
+				cv::cvtColor(current_image, current_image, cv::COLOR_GRAY2BGR);
 
+				// Update preview window
+				cvui::image(
+					window, IMG_X, IMG_Y, current_image
+				);
+			}
 
+			// Update the timer
+			last = std::chrono::steady_clock::now();
+		}
+
+		// Update the user interface
 		cvui::update();
-
 		cvui::imshow(WINDOW_NAME, window);
 
-
 		// For now break from endless loop only using escape key!
+		// TODO: remove this later, by now use it when "Quit" button may not work!
 		if (cv::waitKey(1) == 27) break;
 	}
 
 
+	///	Try to stop capturing images using the camera
+	///
 	if (cameraDevice->stopCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not stop recording images (not harmful as this happens at the end!)
 		handleTSTATUS(CD_STOP_CAPTURE);
@@ -128,6 +181,7 @@ int main(int argc, char** argv) {
 
 
 	cout << "Stops running ..." << endl;
+	return 0;
 }
 
 
@@ -136,47 +190,58 @@ int main(int argc, char** argv) {
  *	Starts the user interface once and for all (update done in loop)
  *
  *	@param window			the user interface window
+ *	@return					SUCCESS if the user interface could be set up otherwise an error
  */
 TSTATUS startUI(cv::Mat& window) {
-	// Create window and set background
-	window = cv::Mat(cv::Size(WINDOW_WIDTH, WINDOW_HEIGHT), CV_8UC3);
-	window = cv::Scalar(157, 161, 170);
+	try {
+		// Create window and set background
+		window = cv::Mat(cv::Size(WINDOW_WIDTH, WINDOW_HEIGHT), CV_8UC3);
+		window = cv::Scalar(157, 161, 170);
 
-	// Initialize cvui
-	cvui::init(WINDOW_NAME);
+		// Initialize cvui
+		cvui::init(WINDOW_NAME);
 
-	// Set UI elements
-	// 1) Save button
-	cvui::button(
-		window, BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_WIDTH, BTN_SAVE_HEIGHT, BTN_SAVE_TEXT
-	);
+		// Set UI elements:
+		// 1) Save button
+		cvui::button(
+			window, BTN_SAVE_X, BTN_SAVE_Y, BTN_SAVE_WIDTH, BTN_SAVE_HEIGHT, BTN_SAVE_TEXT
+		);
 
-	// 2) Change preview button (from depth to grayscale and vise versa)
-	cvui::button(
-		window, BTN_PRE_X, BTN_PRE_Y, BTN_PRE_WIDTH, BTN_PRE_HEIGHT, BTN_PRE_TEXT
-	);
+		// 2) Change preview button (from depth to grayscale and vise versa)
+		cvui::button(
+			window, BTN_PRE_X, BTN_PRE_Y, BTN_PRE_WIDTH, BTN_PRE_HEIGHT, BTN_PRE_TEXT
+		);
 
-	// 3) Start button (to resume camera live feed)
-	cvui::button(
-		window, BTN_START_X, BTN_START_Y, BTN_START_WIDTH, BTN_START_HEIGHT, BTN_START_TEXT
-	);
+		// 3) Start button (to resume camera live feed)
+		cvui::button(
+			window, BTN_START_X, BTN_START_Y, BTN_START_WIDTH, BTN_START_HEIGHT, BTN_START_TEXT
+		);
 
-	// 4) Stop button (to stop camera live feed at current image)
-	cvui::button(
-		window, BTN_STOP_X, BTN_STOP_Y, BTN_STOP_WIDTH, BTN_STOP_HEIGHT, BTN_STOP_TEXT
-	);
+		// 4) Stop button (to stop camera live feed at current image)
+		cvui::button(
+			window, BTN_STOP_X, BTN_STOP_Y, BTN_STOP_WIDTH, BTN_STOP_HEIGHT, BTN_STOP_TEXT
+		);
 
-	// 5) Quit button (to quit application as closing the OpenCV windows does not work
-	cvui::button(
-		window, BTN_QUIT_X, BTN_QUIT_Y, BTN_QUIT_WIDTH, BTN_QUIT_HEIGHT, BTN_QUIT_TEXT
-	);
+		// 5) Quit button (to quit application as closing the OpenCV windows does not work
+		cvui::button(
+			window, BTN_QUIT_X, BTN_QUIT_Y, BTN_QUIT_WIDTH, BTN_QUIT_HEIGHT, BTN_QUIT_TEXT
+		);
 
-	// 3) Preview of camera
-	cv::Mat testbild(cv::Size(IMG_WIDTH, IMG_HEIGHT), CV_8SC3);
-	testbild = cv::Scalar(0, 0, 255);
-	cvui::image(
-		window, IMG_X, IMG_Y, testbild
-	);
+		// 6) Preview of camera (test image before starting to capture)
+		cv::Mat testbild = cv::imread("testbild.png");
+		if (!testbild.data) {
+			// image could not be loaded
+			testbild = cv::Mat(cv::Size(IMG_WIDTH, IMG_HEIGHT), CV_8UC3);
+			testbild = cv::Scalar(0, 0, 255);
+		}
+
+		cvui::image(
+			window, IMG_X, IMG_Y, testbild
+		);
+	} catch (const std::exception& e) {
+		// TODO: log the error?
+		return UI_SETUP;
+	}
 
 	return SUCCESS;
 }

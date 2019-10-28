@@ -14,7 +14,8 @@ bool handleTSTATUS(TSTATUS error) {
 
 	switch (error) {
 	case SUCCESS:
-		// Success was given (not a particular error but ok)
+	case UI_QUIT:
+		// This stati should not be handled but occured. Just do nothing!
 		return true;
 
 	case SH_GETWORKAREA:
@@ -66,16 +67,27 @@ bool handleTSTATUS(TSTATUS error) {
 		msgbox_type = MB_OK | MB_ICONWARNING;
 		break;
 
+	case UI_SETUP:
+		// Could not setup the user interface
+		msgbox_text = L"Could not setup/ start the UI!\nMaybe restart the program!\nIf error does not resolve contact us!";
+		msgbox_type = MB_OK | MB_ICONSTOP | MB_SYSTEMMODAL;
+		break;
 	case UI_FILESAVEDIALOG:
-		// No possibility to save to user set path! Using users home directory!
-		msgbox_text = L"Can not save to specific path.\nUsing users home directory!";
+		// No possibility to save to user set path! Using users desktop directory!
+		msgbox_text = L"Can not save to specific path.\nUsing users desktop directory!";
 		msgbox_type = MB_OK | MB_ICONINFORMATION;
 		recover = true;
 		break;
 	case UI_HOME_DIRECTORY:
-		// No possibility to save to users home directory! Strictly using default path (C:\)
-		msgbox_text = L"Can not save to users home directory.\nUsing default path C:\\";
+		// No possibility to save to users desktop directory! Strictly using default path (C:\)
+		msgbox_text = L"Can not save to specific path nor users desktop directory.\nUsing default path C:\\";
 		msgbox_type = MB_OK | MB_ICONINFORMATION;
+		recover = true;
+		break;
+	case UI_SAVE_IMAGE:
+		// Image could not be saved, only camera image viewing possible :(
+		msgbox_text = L"Can not save image to file.\nThis is a problem with your specific installation!\n";
+		msgbox_type = MB_OKCANCEL | MB_ICONSTOP | MB_SYSTEMMODAL;
 		recover = true;
 		break;
 	default:

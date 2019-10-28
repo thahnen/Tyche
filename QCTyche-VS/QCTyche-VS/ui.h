@@ -109,17 +109,29 @@ TSTATUS getFileSavePath(std::string& file_path) {
 
 
 /**
- *	Requests the users home directory as alternative to personally set path!
+ *	Requests the users desktop directory as alternative to personally set path!
  *
  *	@param file_path		where to store the path
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  */
-TSTATUS getUserDirectory(std::string& file_path) {
-	return SUCCESS;
+TSTATUS getUserDesktopDirectory(std::string& file_path) {
+	PWSTR ppath;
+	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, NULL, &ppath);
+
+	if (SUCCEEDED(hr)) {
+		std::wstring wpath = ppath;
+		file_path = std::string(wpath.begin(), wpath.end());
+
+		return SUCCESS;
+	}
+
+	return UI_HOME_DIRECTORY;
 }
 
 
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
 /**
  *	Handler for mouse actions (cvui::CLICK)
  *
@@ -133,11 +145,11 @@ TSTATUS getUserDirectory(std::string& file_path) {
  *	TODO: create smaller handlers for buttons etc!
  */
 TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv::Mat* image) {
-	std::string path;
+	TSTATUS stat = SUCCESS;
 
 	if (x >= BTN_QUIT_X && x <= BTN_QUIT_X + BTN_QUIT_WIDTH && y >= BTN_QUIT_Y && y <= BTN_QUIT_Y + BTN_QUIT_HEIGHT) {
-		// Quit gedrückt! (noch eigenen "Fehler ausdenken)
-		return CD_REGISTER_LIST;
+		// Quit button pressed, ending the application!
+		stat = UI_QUIT;
 	} else if (x >= BTN_PRE_X && x <= BTN_PRE_X + BTN_PRE_WIDTH && y >= BTN_PRE_Y && y <= BTN_PRE_Y + BTN_PRE_HEIGHT) {
 		// Change the preview to the opposite image
 		*displayDepth = !(*displayDepth);
@@ -152,21 +164,20 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 		std::string path;
 
 		// 1) Get a path to save to
-		if (getFileSavePath(path) != SUCCESS) {
+		if ((stat = getFileSavePath(path)) != SUCCESS) {
 			// Can not request save path, get user home path instead
-			PWSTR ppath;
-			HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, NULL, &ppath);
-			if (SUCCEEDED(hr)) {
-				std::wstring wpath = ppath;
-				path = std::string(wpath.begin(), wpath.end());
-			} else {
-				// Can not request user desktop path, get C:\ instead
+
+			if ((stat = getUserDesktopDirectory(path)) != SUCCESS) {
+				// Can not request user desktop directory path, using C:\ instead
 				path = "C:\\";
 			}
 
 			// as no file name was given, a new one is created from timestamp
-			std::time_t timestamp = std::time(nullptr);
-			path += std::asctime(std::localtime(&timestamp));
+			std::ostringstream oss;
+			std::time_t t = std::time(nullptr);
+
+			oss << std::put_time(std::localtime(&t), "%c %Z");
+			path += oss.str();
 			path += ".png";
 
 			// replace every space with underscore
@@ -176,10 +187,12 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 		}
 
 		// 2) Save image to file using requested path
-		if (cv::imwrite(path, *image)) {
+		if (!cv::imwrite(path, *image)) {
 			// Can not save image to file!
+			stat = UI_SAVE_IMAGE;
 		}
 	}
 
-	return getFileSavePath(path);
+	return stat;
 }
+#pragma warning(pop)
