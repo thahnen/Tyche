@@ -1,10 +1,12 @@
 #pragma once
 
 #include <string>
-#include <ShObjIdl_core.h>
+#include <ctime>
+#include <ShlObj.h>
+#include <KnownFolders.h>
+#include <opencv2/opencv.hpp>
 
 #include "Status.h"
-#include <cstring>
 
 
 #define WINDOW_NAME			"QCTyche"
@@ -123,16 +125,60 @@ TSTATUS getUserDirectory(std::string& file_path) {
  *
  *	@param x				the x coordinate where the mouse clicked
  *	@param y				the y coordunate where the mouse clicked
+ *	@param displayDepth		the variable which indicates if the depth or the grayscale image is displayed
+ *	@param captureNew		the variable which indicates if a new image should be requested every loop or not
+ *	@param image			the varuable which holds the current image and is used for saving it
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  *
  *	TODO: create smaller handlers for buttons etc!
  */
-TSTATUS handleMouseInput(int x, int y) {
+TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv::Mat* image) {
 	std::string path;
 
 	if (x >= BTN_QUIT_X && x <= BTN_QUIT_X + BTN_QUIT_WIDTH && y >= BTN_QUIT_Y && y <= BTN_QUIT_Y + BTN_QUIT_HEIGHT) {
 		// Quit gedrückt! (noch eigenen "Fehler ausdenken)
 		return CD_REGISTER_LIST;
+	} else if (x >= BTN_PRE_X && x <= BTN_PRE_X + BTN_PRE_WIDTH && y >= BTN_PRE_Y && y <= BTN_PRE_Y + BTN_PRE_HEIGHT) {
+		// Change the preview to the opposite image
+		*displayDepth = !(*displayDepth);
+	} else if (*captureNew && x >= BTN_STOP_X && BTN_STOP_X + BTN_STOP_WIDTH && y >= BTN_STOP_Y && y <= BTN_STOP_Y + BTN_STOP_HEIGHT) {
+		// Only if camera is capturing and "Stop" is pressed stop capturing
+		*captureNew = false;
+	} else if (!(*captureNew) && x >= BTN_START_X && x <= BTN_START_X + BTN_START_WIDTH && y >= BTN_START_Y && y <= BTN_START_Y + BTN_START_HEIGHT) {
+		// Only if camera is not capturing and "Start" is pressed start capturing again
+		*captureNew = true;
+	} else if (x >= BTN_SAVE_X && x <= BTN_SAVE_X + BTN_SAVE_WIDTH && y >= BTN_SAVE_Y && y <= BTN_SAVE_Y + BTN_SAVE_HEIGHT) {
+		// Save the current image
+		std::string path;
+
+		// 1) Get a path to save to
+		if (getFileSavePath(path) != SUCCESS) {
+			// Can not request save path, get user home path instead
+			PWSTR ppath;
+			HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, NULL, &ppath);
+			if (SUCCEEDED(hr)) {
+				std::wstring wpath = ppath;
+				path = std::string(wpath.begin(), wpath.end());
+			} else {
+				// Can not request user desktop path, get C:\ instead
+				path = "C:\\";
+			}
+
+			// as no file name was given, a new one is created from timestamp
+			std::time_t timestamp = std::time(nullptr);
+			path += std::asctime(std::localtime(&timestamp));
+			path += ".png";
+
+			// replace every space with underscore
+			std::transform(path.begin(), path.end(), path.begin(), [](char ch) {
+				return ch == ' ' ? '_' : ch;
+			});
+		}
+
+		// 2) Save image to file using requested path
+		if (cv::imwrite(path, *image)) {
+			// Can not save image to file!
+		}
 	}
 
 	return getFileSavePath(path);

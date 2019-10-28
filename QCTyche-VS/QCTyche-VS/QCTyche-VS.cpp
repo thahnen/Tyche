@@ -79,9 +79,17 @@ int main(int argc, char** argv) {
 		return -5;
 	}
 
-	/// Test sleeping!
+	/// Sleeping for camera to capture first images before requesting one!
 	Sleep(1000);
 
+	/// Camera image for access over more than one loop
+	cv::Mat current_image;
+
+	/// Which image is displayed (grayscale or depth)
+	bool displayDepth = true;
+
+	/// Image "capturing" is stopped
+	bool captureNew = true;
 
 	for (;;) {
 		cv::Point cursor = cvui::mouse(WINDOW_NAME);
@@ -90,7 +98,7 @@ int main(int argc, char** argv) {
 		if (cvui::mouse(cvui::DOWN)) {
 			cout << "Mouse clicked -> x:" << cursor.x << " y:" << cursor.y << endl;
 
-			if (handleMouseInput(cursor.x, cursor.y) != SUCCESS) break;
+			if (handleMouseInput(cursor.x, cursor.y, &displayDepth, &captureNew, &current_image) != SUCCESS) break;
 		}
 
 		// Update preview window
