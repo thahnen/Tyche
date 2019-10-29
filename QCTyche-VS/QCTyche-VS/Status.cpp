@@ -39,6 +39,12 @@ bool handleTSTATUS(TSTATUS error) {
 		msgbox_type = MB_RETRYCANCEL | MB_ICONQUESTION | MB_DEFBUTTON1 | MB_SYSTEMMODAL;
 		recover = true;
 		break;
+	case CL_MORE_CAMS:
+		// There are more than one camera (inform the user, maybe wrong one is used)
+		msgbox_text = L"More than one camera found.\nIf it is not the right one, unplug it!";
+		msgbox_type = MB_OK | MB_ICONINFORMATION;
+		recover = true;
+		break;
 	case CL_LIST_NULLPTR:
 	case CL_CAMERA_INIT:
 	case CL_CAMERA_INIT_RAV:

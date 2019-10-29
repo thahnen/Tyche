@@ -57,6 +57,11 @@
  *
  *	@param file_path		where to store the path
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
+ *
+ *	BUG: Wenn Speicherort vom Benutzer gewählt aber kein Bild unter dem Pfad gespeichert wurde
+ *	BUG: taucht die "Datei" trotzdem im Explorer unter "Zuletzt verwendete Dateien" auf!
+ *
+ *	TODO: Bug bei MS melden!
  */
 TSTATUS getFileSavePath(std::string& file_path) {
 	IFileSaveDialog* fsd;
@@ -169,7 +174,7 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 
 			if ((stat = getUserDesktopDirectory(path)) != SUCCESS) {
 				// Can not request user desktop directory path, using C:\ instead
-				path = "C:\\";
+				path = DEFAULT_PATH;
 			}
 
 			// as no file name was given, a new one is created from timestamp

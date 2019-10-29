@@ -70,12 +70,14 @@ private:
 	 */
 	void setLensParameters(const royale::LensParameters& lensParameters);
 
-
+	/// Mutex for updating the images per frame
 	std::mutex flagMutex;
 
+	/// The matrices derived from the camera lens parameters
 	cv::Mat cameraMatrix;
 	cv::Mat distortionCoefficients;
 
+	/// The two images produced by the camera
 	cv::Mat depthImage;
 	cv::Mat grayImage;
 };

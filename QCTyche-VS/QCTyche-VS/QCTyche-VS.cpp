@@ -149,12 +149,13 @@ int main(int argc, char** argv) {
 				if (displayDepth)	current_image = listener.getNewestDepthImage(CV_8UC1);
 				else				current_image = listener.getNewestGrayscaleImage(CV_8UC1);
 
-				cv::resize(current_image, current_image, cv::Size(current_image.cols * 2, current_image.rows * 2), 0, 0, cv::INTER_LINEAR);
-				cv::cvtColor(current_image, current_image, cv::COLOR_GRAY2BGR);
+				cv::Mat resized = current_image.clone();
+				cv::resize(resized, resized, cv::Size(resized.cols * 2, resized.rows * 2), 0, 0, cv::INTER_LINEAR);
+				cv::cvtColor(resized, resized, cv::COLOR_GRAY2BGR);
 
 				// Update preview window
 				cvui::image(
-					window, IMG_X, IMG_Y, current_image
+					window, IMG_X, IMG_Y, resized
 				);
 			}
 

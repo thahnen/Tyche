@@ -12,6 +12,7 @@ typedef enum {
 	CL_LIST_EMPTY,			// CameraListener: list of cameras empty
 	CL_LIST_OOB,			// CameraListener: list item out of bounds requested
 	CL_LIST_NULLPTR,		// CameraListener: list item is nullprt
+	CL_MORE_CAMS,			// CameraListener: more than one camera in the list
 	CL_CAMERA_INIT,			// CameraListener: can not initialize camera
 	CL_CAMERA_INIT_RAV,		// CameraListener: read access violation in camera initialization
 	CL_LENS_PARAM,			// CameraListener: can not get camera lens parameters

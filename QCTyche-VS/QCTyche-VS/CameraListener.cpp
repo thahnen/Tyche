@@ -26,8 +26,13 @@ TSTATUS CameraListener::requestSpecificCamera(std::unique_ptr<royale::ICameraDev
 	if (device == nullptr)
 		return CL_LIST_NULLPTR;
 
+	// Additionally test if there is more than one camera (maybe the wrong one is used)
+	TSTATUS stat;
+	if (camlist.size() > 1)	stat = CL_MORE_CAMS;
+	else					stat = SUCCESS;
+
 	camlist.clear();
-	return SUCCESS;
+	return stat;
 }
 
 

@@ -12,9 +12,10 @@
  *	@param ui_width				the width the monitor resolution must be at least
  *	@param ui_height			the height the monitor resolution must be at least
  *	@return						SUCCESS if the resolution matches the requirements otherwise an error
+ *
+ *	TODO: test if more than one monitor is available!
  */
 TSTATUS checkResolutionRequirements(int ui_width, int ui_height) {
-	// TODO: testen, ob es mehr als einen Bildschirm gibt, so wird nur der Hauptbildschirm ueberprueft!
 	RECT screen;
 
 	if (SystemParametersInfo(SPI_GETWORKAREA, 0, &screen, 0) == 0) {
