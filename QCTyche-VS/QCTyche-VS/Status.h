@@ -24,6 +24,7 @@ typedef enum {
 
 	UI_SETUP,				// UI: could not set up the UI (cvui.h may be a bit buggy sometimes)
 	UI_QUIT,				// UI: user pressed "Quit" button to quit the application!
+	UI_SAVE_CANCELLED,		// UI: user cancelled the saving process
 	UI_FILESAVEDIALOG,		// UI: could not get path for saving the file (using Windows Common Item Dialog)
 	UI_HOME_DIRECTORY,		// UI: could not get users home directory
 	UI_SAVE_IMAGE,			// UI: could not save image to path

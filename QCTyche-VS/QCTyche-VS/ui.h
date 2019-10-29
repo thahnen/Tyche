@@ -12,41 +12,48 @@
 #define WINDOW_NAME			"QCTyche"
 #define WINDOW_WIDTH		640
 #define WINDOW_HEIGHT		480
+#define WINDOW_COLOR		0xAAA19D
 
 #define BTN_SAVE_TEXT		"Save image to file"
 #define BTN_SAVE_WIDTH		140
 #define BTN_SAVE_HEIGHT		30
 #define BTN_SAVE_X			250
-#define BTN_SAVE_Y			380
+#define BTN_SAVE_Y			390
 
 #define BTN_PRE_TEXT		"Change Preview"
 #define BTN_PRE_WIDTH		140
 #define BTN_PRE_HEIGHT		30
 #define BTN_PRE_X			250
-#define BTN_PRE_Y			420
+#define BTN_PRE_Y			430
 
 #define BTN_START_TEXT		"Start"
 #define BTN_START_WIDTH		70
 #define BTN_START_HEIGHT	30
 #define BTN_START_X			150
-#define BTN_START_Y			380
+#define BTN_START_Y			390
 
 #define BTN_STOP_TEXT		"Stop"
 #define BTN_STOP_WIDTH		70
 #define BTN_STOP_HEIGHT		30
 #define BTN_STOP_X			150
-#define BTN_STOP_Y			420
+#define BTN_STOP_Y			430
 
 #define BTN_QUIT_TEXT		"Quit"
 #define BTN_QUIT_WIDTH		70
 #define BTN_QUIT_HEIGHT		30
 #define BTN_QUIT_X			420
-#define BTN_QUIT_Y			400
+#define BTN_QUIT_Y			410
+
+#define TXT_PRE_TEXT		"Preview: NULL"
+#define TXT_PRE_SCALE		0.6
+#define TXT_PRE_COLOR		0x323232
+#define TXT_PRE_X			250
+#define TXT_PRE_Y			10
 
 #define IMG_WIDTH			448
 #define IMG_HEIGHT			342
 #define IMG_X				96
-#define IMG_Y				20
+#define IMG_Y				35
 
 
 #define DEFAULT_PATH		"C:\\"
@@ -62,6 +69,7 @@
  *	BUG: taucht die "Datei" trotzdem im Explorer unter "Zuletzt verwendete Dateien" auf!
  *
  *	TODO: Bug bei MS melden!
+ *	TODO: Handle clicking "Cancel" in window!
  */
 TSTATUS getFileSavePath(std::string& file_path) {
 	IFileSaveDialog* fsd;
@@ -81,6 +89,9 @@ TSTATUS getFileSavePath(std::string& file_path) {
 
 		// Show dialog box
 		res = fsd->Show(NULL);
+
+		// Return immediately if "Cancel" was pressed
+		if (res == HRESULT_FROM_WIN32(ERROR_CANCELLED))	return UI_SAVE_CANCELLED;
 
 		if (SUCCEEDED(res)) {
 			// Get the resulting item
@@ -147,7 +158,7 @@ TSTATUS getUserDesktopDirectory(std::string& file_path) {
  *	@param image			the varuable which holds the current image and is used for saving it
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  *
- *	TODO: create smaller handlers for buttons etc!
+ *	TODO: Maybe inform user where image was saved!
  */
 TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv::Mat* image) {
 	TSTATUS stat = SUCCESS;
@@ -169,26 +180,39 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 		std::string path;
 
 		// 1) Get a path to save to
-		if ((stat = getFileSavePath(path)) != SUCCESS) {
+		stat = getFileSavePath(path);
+		if (stat == UI_SAVE_CANCELLED)	return stat;
+
+		if (stat != SUCCESS) {
 			// Can not request save path, get user home path instead
+
+			std::cout << "getFileSavePath failed!" << std::endl;
 
 			if ((stat = getUserDesktopDirectory(path)) != SUCCESS) {
 				// Can not request user desktop directory path, using C:\ instead
 				path = DEFAULT_PATH;
 			}
 
+			path += "\\";
+
 			// as no file name was given, a new one is created from timestamp
+			std::string filename = "camera.";
 			std::ostringstream oss;
 			std::time_t t = std::time(nullptr);
 
-			oss << std::put_time(std::localtime(&t), "%c %Z");
-			path += oss.str();
-			path += ".png";
+			oss << std::put_time(std::localtime(&t), "%c");
+			filename += oss.str();
+			filename += ".png";
 
-			// replace every space with underscore
-			std::transform(path.begin(), path.end(), path.begin(), [](char ch) {
-				return ch == ' ' ? '_' : ch;
+			// replace every space + forward slash + colon with underscore
+			std::transform(filename.begin(), filename.end(), filename.begin(), [](char ch) {
+				if (ch == ' ' || ch == '/' || ch == ':') return '_';
+				return ch;
 			});
+
+			path += filename;
+
+			std::cout << "Path: " << path << std::endl;
 		}
 
 		// 2) Save image to file using requested path

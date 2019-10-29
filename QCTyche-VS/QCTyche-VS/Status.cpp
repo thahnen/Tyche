@@ -14,6 +14,7 @@ bool handleTSTATUS(TSTATUS error) {
 
 	switch (error) {
 	case SUCCESS:
+	case UI_SAVE_CANCELLED:
 	case UI_QUIT:
 		// This stati should not be handled but occured. Just do nothing!
 		return true;

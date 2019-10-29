@@ -26,6 +26,9 @@ TSTATUS startUI(cv::Mat& window);
 /**
  *	Main program running
  *	=> no possible command line arguments yet, may change in the future!
+ *
+ *	BUG: When OpenCV window was closed not using the "Quit" button the UI could not respond to any mouse action!
+ *	TODO: Maybe handle mouse actions not using CVUI but using own mechanism?
  */
 int main(int argc, char** argv) {
 	/// Status variable used throughout the program to handle return states
@@ -145,13 +148,30 @@ int main(int argc, char** argv) {
 			).count() >= (long long)std::floor(1000 / fps)) {
 			// Request new image (if "capturing" not stopped)
 			if (captureNew) {
+				std::string pre_text("Preview: ");
+
 				// Which image should be requested?
-				if (displayDepth)	current_image = listener.getNewestDepthImage(CV_8UC1);
-				else				current_image = listener.getNewestGrayscaleImage(CV_8UC1);
+				if (displayDepth) {
+					current_image = listener.getNewestDepthImage(CV_8UC1);
+					pre_text += "Depth";
+				} else {
+					current_image = listener.getNewestGrayscaleImage(CV_8UC1);
+					pre_text += "Grayscale";
+				}
 
 				cv::Mat resized = current_image.clone();
 				cv::resize(resized, resized, cv::Size(resized.cols * 2, resized.rows * 2), 0, 0, cv::INTER_LINEAR);
 				cv::cvtColor(resized, resized, cv::COLOR_GRAY2BGR);
+
+				// Overshadow old preview text
+				cvui::rect(
+					window, TXT_PRE_X - 10, TXT_PRE_Y - 5, 200, 40, WINDOW_COLOR, WINDOW_COLOR
+				);
+
+				// Update preview text
+				cvui::text(
+					window, TXT_PRE_X, TXT_PRE_Y, pre_text, TXT_PRE_SCALE, TXT_PRE_COLOR
+				);
 
 				// Update preview window
 				cvui::image(
@@ -228,7 +248,12 @@ TSTATUS startUI(cv::Mat& window) {
 			window, BTN_QUIT_X, BTN_QUIT_Y, BTN_QUIT_WIDTH, BTN_QUIT_HEIGHT, BTN_QUIT_TEXT
 		);
 
-		// 6) Preview of camera (test image before starting to capture)
+		// 6) Text for preview (showing which image is displayed)
+		cvui::text(
+			window, TXT_PRE_X, TXT_PRE_Y, TXT_PRE_TEXT, TXT_PRE_SCALE, TXT_PRE_COLOR
+		);
+
+		// 7) Preview of camera (test image before starting to capture)
 		cv::Mat testbild = cv::imread("testbild.png");
 		if (!testbild.data) {
 			// image could not be loaded
