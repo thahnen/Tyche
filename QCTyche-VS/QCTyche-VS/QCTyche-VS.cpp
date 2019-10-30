@@ -106,10 +106,11 @@ int main(int argc, char** argv) {
 	Sleep(1000);
 
 
-	/// Camera image for access over more than one loop (this is resized, we also need the non-resized version!)
+	/// Camera image for access over more than one loop (non-resized CV_8UC3 and CV_32F matrix)
 	/// Variable indicating which image is displayed (grayscale or depth)
 	/// Variable indicating if image "capturing" is stopped
 	cv::Mat current_image;
+	cv::Mat current_float_mat;
 	bool displayDepth = true;
 	bool captureNew = true;
 
@@ -133,7 +134,9 @@ int main(int argc, char** argv) {
 		if (cvui::mouse(cvui::DOWN)) {
 			cout << "Mouse clicked -> x:" << cursor.x << " y:" << cursor.y << endl;
 
-			if ((stat = handleMouseInput(cursor.x, cursor.y, &displayDepth, &captureNew, &current_image)) == UI_QUIT) {
+			if ((stat = handleMouseInput(
+					cursor.x, cursor.y, displayDepth, captureNew, current_image, current_float_mat
+				)) == UI_QUIT) {
 				break;
 			}
 
@@ -153,15 +156,22 @@ int main(int argc, char** argv) {
 				// Which image should be requested?
 				if (displayDepth) {
 					current_image = listener.getNewestDepthImage(CV_8UC1);
+					current_float_mat = listener.getNewestDepthImage();
 					pre_text += "Depth";
 				} else {
 					current_image = listener.getNewestGrayscaleImage(CV_8UC1);
+					current_float_mat = listener.getNewestGrayscaleImage();
 					pre_text += "Grayscale";
 				}
 
 				cv::Mat resized = current_image.clone();
 				cv::resize(resized, resized, cv::Size(resized.cols * 2, resized.rows * 2), 0, 0, cv::INTER_LINEAR);
 				cv::cvtColor(resized, resized, cv::COLOR_GRAY2BGR);
+				
+				// Apply color map if it is depth image
+				if (displayDepth) {
+					cv::applyColorMap(resized, resized, cv::COLORMAP_COOL);
+				}
 
 				// Overshadow old preview text
 				cvui::rect(

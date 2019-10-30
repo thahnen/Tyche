@@ -7,6 +7,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "Status.h"
+#include "FileHandler.h"
 
 
 #define WINDOW_NAME			"QCTyche"
@@ -156,11 +157,12 @@ TSTATUS getUserDesktopDirectory(std::string& file_path) {
  *	@param displayDepth		the variable which indicates if the depth or the grayscale image is displayed
  *	@param captureNew		the variable which indicates if a new image should be requested every loop or not
  *	@param image			the varuable which holds the current image and is used for saving it
+ *	@param mat_float		the variable which holds the current float matrix and is used for saving it
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  *
  *	TODO: Maybe inform user where image was saved!
  */
-TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv::Mat* image) {
+TSTATUS handleMouseInput(int x, int y, bool& displayDepth, bool& captureNew, cv::Mat& image, cv::Mat& mat_float) {
 	TSTATUS stat = SUCCESS;
 
 	if (x >= BTN_QUIT_X && x <= BTN_QUIT_X + BTN_QUIT_WIDTH && y >= BTN_QUIT_Y && y <= BTN_QUIT_Y + BTN_QUIT_HEIGHT) {
@@ -168,13 +170,13 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 		stat = UI_QUIT;
 	} else if (x >= BTN_PRE_X && x <= BTN_PRE_X + BTN_PRE_WIDTH && y >= BTN_PRE_Y && y <= BTN_PRE_Y + BTN_PRE_HEIGHT) {
 		// Change the preview to the opposite image
-		*displayDepth = !(*displayDepth);
-	} else if (*captureNew && x >= BTN_STOP_X && BTN_STOP_X + BTN_STOP_WIDTH && y >= BTN_STOP_Y && y <= BTN_STOP_Y + BTN_STOP_HEIGHT) {
+		displayDepth = !(displayDepth);
+	} else if (captureNew && x >= BTN_STOP_X && BTN_STOP_X + BTN_STOP_WIDTH && y >= BTN_STOP_Y && y <= BTN_STOP_Y + BTN_STOP_HEIGHT) {
 		// Only if camera is capturing and "Stop" is pressed stop capturing
-		*captureNew = false;
-	} else if (!(*captureNew) && x >= BTN_START_X && x <= BTN_START_X + BTN_START_WIDTH && y >= BTN_START_Y && y <= BTN_START_Y + BTN_START_HEIGHT) {
+		captureNew = false;
+	} else if (!(captureNew) && x >= BTN_START_X && x <= BTN_START_X + BTN_START_WIDTH && y >= BTN_START_Y && y <= BTN_START_Y + BTN_START_HEIGHT) {
 		// Only if camera is not capturing and "Start" is pressed start capturing again
-		*captureNew = true;
+		captureNew = true;
 	} else if (x >= BTN_SAVE_X && x <= BTN_SAVE_X + BTN_SAVE_WIDTH && y >= BTN_SAVE_Y && y <= BTN_SAVE_Y + BTN_SAVE_HEIGHT) {
 		// Save the current image
 		std::string path;
@@ -202,7 +204,6 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 
 			oss << std::put_time(std::localtime(&t), "%c");
 			filename += oss.str();
-			filename += ".png";
 
 			// replace every space + forward slash + colon with underscore
 			std::transform(filename.begin(), filename.end(), filename.begin(), [](char ch) {
@@ -216,10 +217,7 @@ TSTATUS handleMouseInput(int x, int y, bool* displayDepth, bool* captureNew, cv:
 		}
 
 		// 2) Save image to file using requested path
-		if (!cv::imwrite(path, *image)) {
-			// Can not save image to file!
-			stat = UI_SAVE_IMAGE;
-		}
+		stat = saveMatrix(path, image, mat_float);
 	}
 
 	return stat;

@@ -27,7 +27,11 @@ typedef enum {
 	UI_SAVE_CANCELLED,		// UI: user cancelled the saving process
 	UI_FILESAVEDIALOG,		// UI: could not get path for saving the file (using Windows Common Item Dialog)
 	UI_HOME_DIRECTORY,		// UI: could not get users home directory
-	UI_SAVE_IMAGE,			// UI: could not save image to path
+
+	FH_SAVE_IMAGE,			// FileHandler: could not save image to path
+	FH_SAVE_MATRIX,			// FileHandler: could not save float matrix to path
+	FH_LOAD_NOT_FOUND,		// FileHandler: file to load was not found at given path
+	FH_LOAD_MATRIX,			// FileHandler: could not load float matrix from file
 } TSTATUS;
 
 

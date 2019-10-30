@@ -54,11 +54,11 @@ public:
 	void onNewData(const royale::DepthData* data) override;
 
 
-	/// Returns the newest depth image, conversion using type
+	/// Returns the newest depth image, conversion using type (without conversion the type is cv::CV_32F)
 	cv::Mat getNewestDepthImage() { return depthImage; }
 	cv::Mat getNewestDepthImage(int type);
 
-	/// Returns the newest grayscale image, conversion using type
+	/// Returns the newest grayscale image, conversion using type (without conversion the type is cv::CV_32F)
 	cv::Mat getNewestGrayscaleImage() { return grayImage; }
 	cv::Mat getNewestGrayscaleImage(int type);
 private:

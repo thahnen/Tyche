@@ -166,12 +166,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CameraListener.cpp" />
+    <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="QCTyche-VS.cpp" />
     <ClCompile Include="Status.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CameraListener.h" />
     <ClInclude Include="cvui.h" />
+    <ClInclude Include="FileHandler.h" />
     <ClInclude Include="Status.h" />
     <ClInclude Include="SystemHandler.h" />
     <ClInclude Include="ui.h" />

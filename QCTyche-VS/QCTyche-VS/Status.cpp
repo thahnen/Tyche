@@ -91,10 +91,24 @@ bool handleTSTATUS(TSTATUS error) {
 		msgbox_type = MB_OK | MB_ICONINFORMATION;
 		recover = true;
 		break;
-	case UI_SAVE_IMAGE:
+
+	case FH_SAVE_IMAGE:
+	case FH_SAVE_MATRIX:
 		// Image could not be saved, only camera image viewing possible :(
-		msgbox_text = L"Can not save image to file.\nThis is a problem with your specific installation!\n";
+		msgbox_text = L"Can not save image to file.\nThis is a problem with your specific installation!";
 		msgbox_type = MB_OKCANCEL | MB_ICONSTOP | MB_SYSTEMMODAL;
+		recover = true;
+		break;
+	case FH_LOAD_NOT_FOUND:
+		// YML file was not found at given path
+		msgbox_text = L"YML file was not found at given path!";
+		msgbox_type = MB_OK | MB_ICONWARNING;
+		recover = true;
+		break;
+	case FH_LOAD_MATRIX:
+		// Float matrix could not be loaded from given file
+		msgbox_text = L"Float matrix could not be loaded from YML file!";
+		msgbox_type = MB_OK | MB_ICONSTOP | MB_SYSTEMMODAL;
 		recover = true;
 		break;
 	default:
