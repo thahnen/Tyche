@@ -16,8 +16,4 @@ QCTyche-VS/QCTyche-VS/Debug/
 QCTyche-VS/QCTyche-VS/Release/
 QCTyche-VS/QCTyche-VS/x64/
 
-
-QCTyche/.idea/
-QCTyche/cmake-build-*/
-QCTyche/.vs/
-QCTyche/out/
+install/Installer/mysetup.exe
