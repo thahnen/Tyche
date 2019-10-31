@@ -3,6 +3,7 @@
 //
 
 #include "CameraListener.h"
+#include "Logger.h"
 
 
 ///	Requests a camera device from the list provided by the camera manager
@@ -112,7 +113,7 @@ cv::Mat CameraListener::getNewestDepthImage(int type) {
 		cv::convertScaleAbs(depthImage, conv, scale, (-min * scale));
 		break;
 	default:
-		std::cerr << "[CameraListener::getNewestDepthImage] Given type: '" << type << "' not allowed!" << std::endl;
+		log(ERROR, "CameraListerner::getNewestDepthImage - Given type not allowed!");
 	}
 
 	return conv;
@@ -139,9 +140,9 @@ cv::Mat CameraListener::getNewestGrayscaleImage(int type) {
 		cv::convertScaleAbs(grayImage, conv, scale);
 		break;
 	default:
-		std::cerr << "[CameraListener::getNewestGrayscaleImage] Given type: '" << type << "' not allowed!" << std::endl;
+		log(ERROR, "CameraListerner::getNewestGrayscaleImage - Given type not allowed!");
 	}
-	
+
 	return conv;
 }
 

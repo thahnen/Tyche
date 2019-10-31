@@ -1,7 +1,6 @@
 // QCTyche-VS.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
 //
 
-#include <iostream>
 #include <chrono>
 #include <Windows.h>
 #include <opencv2/opencv.hpp>
@@ -11,11 +10,10 @@
 #define CVUI_IMPLEMENTATION
 #include "cvui.h"
 
+#include "Logger.h"
 #include "SystemHandler.h"
 #include "CameraListener.h"
 #include "ui.h"
-
-using namespace std;
 
 
 /// Starts the user interface once and for all (update done in loop)
@@ -37,9 +35,10 @@ int main(int argc, char** argv) {
 
 	///	Check the system requirements (monitor resolution, ...)
 	///
-	cout << "Test system on functionality!" << endl;
+	log(INFO, "Testing main monitor resolution.");
 	if ((stat = checkResolutionRequirements(WINDOW_WIDTH, WINDOW_HEIGHT)) != SUCCESS) {
 		// TODO: maybe create resolvable error?
+		log(ERROR, "Monitor resolution to low!");
 		handleTSTATUS(stat);
 		return 1;
 	}
@@ -51,7 +50,9 @@ int main(int argc, char** argv) {
 
 	///	Try to start the gui before minimizing the console window which is only used for logging!
 	///
+	log(INFO, "Starting UI.");
 	if ((stat = startUI(window)) != SUCCESS) {
+		log(ERROR, "Can not start UI!");
 		handleTSTATUS(stat);
 		return 2;
 	}
@@ -69,16 +70,20 @@ int main(int argc, char** argv) {
 
 	///	Try to request a camera until one is plugged in or the user cancels the application
 	///
+	log(INFO, "Requesting a camera.");
 	while ((stat = listener.requestCamera(cameraDevice)) != SUCCESS) {
 		// Wait until camera is plugged in or cancel is pressed (error can be recovered!)
+		log(WARNING, "No camera found, trying again!");
 		if (!handleTSTATUS(stat)) return 3;
 	}
 
 
 	///	Try to configure the camera by setting lens parameters and exposure mode
 	///
+	log(INFO, "Configure camera.");
 	if ((stat = listener.configureCamera(cameraDevice)) != SUCCESS) {
 		// Camera settings can not be configured (error can not be recovered!)
+		log(ERROR, "Camera can not be configured!");
 		handleTSTATUS(stat);
 		return 4;
 	}
@@ -86,8 +91,10 @@ int main(int argc, char** argv) {
 
 	///	Try to register our camera listener to the specific device!
 	///
+	log(INFO, "Registering CameraListener.");
 	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
 		// Camera can not register listener to get images (error can not be recovered!)
+		log(ERROR, "Can not register CameraListener!");
 		handleTSTATUS(CD_REGISTER_LIST);
 		return 5;
 	}
@@ -95,8 +102,10 @@ int main(int argc, char** argv) {
 
 	///	Try to start capturing images using the camera
 	///
+	log(INFO, "Camera starts image capturing.");
 	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not start recording video (error can not be recovered!)
+		log(ERROR, "Camera can not start capturing images!");
 		handleTSTATUS(CD_START_CAPTURE);
 		return 6;
 	}
@@ -119,8 +128,11 @@ int main(int argc, char** argv) {
 	/// Variable holds the last time the image was refreshed
 	auto last = std::chrono::steady_clock::now();
 	uint16_t fps;
+
+	log(INFO, "Requesting camera frame rate.");
 	if (cameraDevice->getFrameRate(fps) != royale::CameraStatus::SUCCESS) {
 		// Can not get camera frame rate, just set to 30 fps
+		log(WARNING, "Can not request camera frame rate, using 30FPS!");
 		fps = 30;
 	}
 
@@ -132,8 +144,6 @@ int main(int argc, char** argv) {
 
 		// TODO: ui function for handling button presses etc!
 		if (cvui::mouse(cvui::DOWN)) {
-			cout << "Mouse clicked -> x:" << cursor.x << " y:" << cursor.y << endl;
-
 			if ((stat = handleMouseInput(
 					cursor.x, cursor.y, displayDepth, captureNew, current_image, current_float_mat
 				)) == UI_QUIT) {
@@ -167,7 +177,7 @@ int main(int argc, char** argv) {
 				cv::Mat resized = current_image.clone();
 				cv::resize(resized, resized, cv::Size(resized.cols * 2, resized.rows * 2), 0, 0, cv::INTER_LINEAR);
 				cv::cvtColor(resized, resized, cv::COLOR_GRAY2BGR);
-				
+
 				// Apply color map if it is depth image
 				if (displayDepth) {
 					cv::applyColorMap(resized, resized, cv::COLORMAP_COOL);
@@ -205,13 +215,15 @@ int main(int argc, char** argv) {
 
 	///	Try to stop capturing images using the camera
 	///
+	log(INFO, "Camera stops image capturing.");
 	if (cameraDevice->stopCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not stop recording images (not harmful as this happens at the end!)
+		log(ERROR, "Camera can not stop capturing images!");
 		handleTSTATUS(CD_STOP_CAPTURE);
 	}
 
 
-	cout << "Stops running ..." << endl;
+	log(INFO, "QCTyche software shutting down!");
 	return 0;
 }
 
@@ -276,8 +288,10 @@ TSTATUS startUI(cv::Mat& window) {
 		);
 	} catch (const std::exception& e) {
 		// TODO: log the error?
+		log(ERROR, "startUI - Error occured creating UI elements!");
 		return UI_SETUP;
 	}
 
+	log(INFO, "startUI - Success creating UI elements.");
 	return SUCCESS;
 }

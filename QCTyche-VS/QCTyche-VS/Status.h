@@ -1,6 +1,7 @@
 #pragma once
 
 
+/// The possible states returned by the functions
 typedef enum {
 	SUCCESS = 0,			// Success on requested function
 

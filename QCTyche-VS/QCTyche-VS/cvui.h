@@ -1154,8 +1154,8 @@ namespace cvui {
 
 
 // Some compilation messages
-#define _CVUI_IMPLEMENTATION_NOTICE "cvui.h: compiling implementation because of CVUI_IMPLEMENTATION. See: https://dovyski.github.io/cvui/usage/"
-#define _CVUI_NO_IMPLEMENTATION_NOTICE "cvui.h: implementation skipped. Ensure one of your C++ files included cvui.h after a #define CVUI_IMPLEMENTATION. See: https://dovyski.github.io/cvui/usage/"
+#define _CVUI_IMPLEMENTATION_NOTICE		"cvui.h: compiling implementation because of CVUI_IMPLEMENTATION. See: https://dovyski.github.io/cvui/usage/"
+#define _CVUI_NO_IMPLEMENTATION_NOTICE	"cvui.h: implementation skipped. Ensure one of your C++ files included cvui.h after a #define CVUI_IMPLEMENTATION. See: https://dovyski.github.io/cvui/usage/"
 
 
 // Below is paranoic, dramatic bug-fixing action to ensure no evil macro
@@ -1361,7 +1361,8 @@ namespace cvui {
 		template<typename num_type>
 		TrackbarParams makeTrackbarParams(num_type theMin, num_type theMax,
 											num_type theStep, int theSegments,
-											const char* theLabelFormat, unsigned int theOptions) {
+											const char* theLabelFormat,
+											unsigned int theOptions) {
 			TrackbarParams aParams;
 
 			aParams.min = (long double)theMin;
@@ -1799,7 +1800,6 @@ namespace cvui {
 
 			// Tell if the button was clicked or not
 			if (aMouseIsOver && aMouse.anyButton.justReleased)	aRet = cvui::CLICK;
-
 			return aRet;
 		}
 
@@ -1807,7 +1807,9 @@ namespace cvui {
 		bool button(cvui_block_t& theBlock, int theX, int theY, int theWidth,
 					int theHeight, const cv::String& theLabel, bool theUpdateLayout) {
 			// Calculate the space that the label will fill
-			cv::Size aTextSize = getTextSize(theLabel, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, nullptr);
+			cv::Size aTextSize = getTextSize(
+				theLabel, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, nullptr
+			);
 
 			// Make the button bit enough to house the label
 			cv::Rect aRect(theX, theY, theWidth, theHeight);
@@ -1829,7 +1831,8 @@ namespace cvui {
 			if (internal::gLastKeyPressed != -1) {
 				// TODO: replace with something like strpos(). I think it has better performance.
 				auto aLabel = internal::createLabel(theLabel);
-				if (aLabel.hasShortcut && (tolower(aLabel.shortcut) == tolower((char)internal::gLastKeyPressed))) {
+				if (aLabel.hasShortcut &&
+					(tolower(aLabel.shortcut) == tolower((char)internal::gLastKeyPressed))) {
 					aWasShortcutPressed = true;
 				}
 			}
@@ -1892,7 +1895,9 @@ namespace cvui {
 						unsigned int theColor) {
 			cvui_mouse_t& aMouse = internal::getContext().mouse;
 			cv::Rect aRect(theX, theY, 15, 15);
-			cv::Size aTextSize = getTextSize(theLabel, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, nullptr);
+			cv::Size aTextSize = getTextSize(
+				theLabel, cv::FONT_HERSHEY_SIMPLEX, 0.4, 1, nullptr
+			);
 			cv::Rect aHitArea(theX, theY, aRect.width + aTextSize.width + 6, aRect.height);
 			bool aMouseIsOver = aHitArea.contains(aMouse.position);
 
@@ -1943,7 +1948,9 @@ namespace cvui {
 			sprintf_s(internal::gBuffer, theFormat, *theValue);
 			render::counter(theBlock, aContentArea, internal::gBuffer);
 
-			if (internal::button(theBlock, aContentArea.x + aContentArea.width, theY, 22, 22, "+", false)) {
+			if (internal::button(
+					theBlock, aContentArea.x + aContentArea.width, theY, 22, 22, "+", false)
+				) {
 				*theValue += theStep;
 			}
 
@@ -1954,6 +1961,7 @@ namespace cvui {
 
 			return *theValue;
 		}
+
 
 		double counter(cvui_block_t& theBlock, int theX, int theY, double* theValue,
 						double theStep, const char* theFormat) {
@@ -1966,7 +1974,9 @@ namespace cvui {
 			sprintf_s(internal::gBuffer, theFormat, *theValue);
 			render::counter(theBlock, aContentArea, internal::gBuffer);
 
-			if (internal::button(theBlock, aContentArea.x + aContentArea.width, theY, 22, 22, "+", false)) {
+			if (internal::button(
+					theBlock, aContentArea.x + aContentArea.width, theY, 22, 22, "+", false)
+				) {
 				*theValue += theStep;
 			}
 
@@ -1986,10 +1996,14 @@ namespace cvui {
 			long double aValue = *theValue;
 			bool aMouseIsOver = aContentArea.contains(aMouse.position);
 
-			render::trackbar(theBlock, aMouseIsOver ? OVER : OUT, aContentArea, *theValue, theParams);
+			render::trackbar(
+				theBlock, aMouseIsOver ? OVER : OUT, aContentArea, *theValue, theParams
+			);
 
 			if (aMouse.anyButton.pressed && aMouseIsOver) {
-				*theValue = internal::trackbarXPixelToValue(theParams, aContentArea, aMouse.position.x);
+				*theValue = internal::trackbarXPixelToValue(
+					theParams, aContentArea, aMouse.position.x
+				);
 
 				if (bitsetHas(theParams.options, TRACKBAR_DISCRETE)) {
 					internal::trackbarForceValuesAsMultiplesOfSmallStep(theParams, theValue);
@@ -2200,8 +2214,12 @@ namespace cvui {
 			int aPixelX = internal::trackbarValueToXPixel(theParams, theShape, theValue);
 			int aIndicatorWidth = 3;
 			int aIndicatorHeight = 4;
-			cv::Point aPoint1(aPixelX - aIndicatorWidth, aBarTopLeft.y - aIndicatorHeight);
-			cv::Point aPoint2(aPixelX + aIndicatorWidth, aBarTopLeft.y + aBarHeight + aIndicatorHeight);
+			cv::Point aPoint1(
+				aPixelX - aIndicatorWidth, aBarTopLeft.y - aIndicatorHeight
+			);
+			cv::Point aPoint2(
+				aPixelX + aIndicatorWidth, aBarTopLeft.y + aBarHeight + aIndicatorHeight
+			);
 			cv::Rect aRect(aPoint1, aPoint2);
 
 			int aFillColor = theState == OVER ? 0x525252 : 0x424242;
@@ -2227,7 +2245,9 @@ namespace cvui {
 		}
 
 
-		void trackbarPath(cvui_block_t& theBlock, int theState, cv::Rect& theShape, double theValue, const internal::TrackbarParams& theParams, cv::Rect& theWorkingArea) {
+		void trackbarPath(cvui_block_t& theBlock, int theState, cv::Rect& theShape,
+							double theValue, const internal::TrackbarParams& theParams,
+							cv::Rect& theWorkingArea) {
 			int aBarHeight = 7;
 			cv::Point aBarTopLeft(theWorkingArea.x, theWorkingArea.y + theWorkingArea.height / 2);
 			cv::Rect aRect(aBarTopLeft, cv::Size(theWorkingArea.width, aBarHeight));
@@ -2250,7 +2270,9 @@ namespace cvui {
 			cv::Scalar aColor(0x51, 0x51, 0x51);
 
 			bool aDiscrete = internal::bitsetHas(theParams.options, cvui::TRACKBAR_DISCRETE);
-			long double aFixedStep = aDiscrete ? theParams.step : (theParams.max - theParams.min) / 20;
+			long double aFixedStep = aDiscrete ? theParams.step : (
+				theParams.max - theParams.min
+			) / 20;
 
 			// TODO: check min, max and step to prevent infinite loop.
 			for (long double aValue = theParams.min; aValue <= theParams.max; aValue += aFixedStep) {
@@ -2320,6 +2342,7 @@ namespace cvui {
 			);
 		}
 
+
 		void trackbar(cvui_block_t& theBlock, int theState, cv::Rect& theShape,
 						double theValue, const internal::TrackbarParams& theParams) {
 			cv::Rect aWorkingArea(
@@ -2329,7 +2352,9 @@ namespace cvui {
 
 			trackbarPath(theBlock, theState, theShape, theValue, theParams, aWorkingArea);
 
-			bool aHideAllLabels = internal::bitsetHas(theParams.options, cvui::TRACKBAR_HIDE_LABELS);
+			bool aHideAllLabels = internal::bitsetHas(
+				theParams.options, cvui::TRACKBAR_HIDE_LABELS
+			);
 			bool aShowSteps = internal::bitsetHas(
 				theParams.options, cvui::TRACKBAR_HIDE_STEP_SCALE
 			) == false;
@@ -2365,7 +2390,9 @@ namespace cvui {
 
 			// Inside
 			theShape.x++; theShape.y++; theShape.width -= 2; theShape.height -= 2;
-			cv::rectangle(theBlock.where, theShape, cv::Scalar(0x29, 0x29, 0x29), CVUI_FILLED);
+			cv::rectangle(
+				theBlock.where, theShape, cv::Scalar(0x29, 0x29, 0x29), CVUI_FILLED
+			);
 		}
 
 
@@ -2416,13 +2443,20 @@ namespace cvui {
 			cv::rectangle(theBlock.where, theContent, cv::Scalar(0x4A, 0x4A, 0x4A));
 
 			// Then the filling.
-			theContent.x++; theContent.y++; theContent.width -= 2; theContent.height -= 2;
-			cv::rectangle(aOverlay, theContent, cv::Scalar(0x31, 0x31, 0x31), CVUI_FILLED);
+			theContent.x++; theContent.y++;
+			theContent.width -= 2; theContent.height -= 2;
+			cv::rectangle(
+				aOverlay, theContent, cv::Scalar(0x31, 0x31, 0x31), CVUI_FILLED
+			);
 
 			if (aTransparecy) {
 				theBlock.where.copyTo(aOverlay);
-				cv::rectangle(aOverlay, theContent, cv::Scalar(0x31, 0x31, 0x31), CVUI_FILLED);
-				cv::addWeighted(aOverlay, aAlpha, theBlock.where, 1.0 - aAlpha, 0.0, theBlock.where);
+				cv::rectangle(
+					aOverlay, theContent, cv::Scalar(0x31, 0x31, 0x31), CVUI_FILLED
+				);
+				cv::addWeighted(
+					aOverlay, aAlpha, theBlock.where, 1.0 - aAlpha, 0.0, theBlock.where
+				);
 
 			} else {
 				cv::rectangle(
@@ -2937,18 +2971,18 @@ namespace cvui {
 
 
 // Final adjustments that are platform-dependent
-#ifdef _MSC_VER
+#	ifdef _MSC_VER
 	// Check if we salved the definitions of min and max, which could have
 	// been defined by windows.h. If that is the case, we have undef'd
 	// them at the begining of this file, so we need to restore the existing
 	// macros now. We want to do good, not make world burn. You're welcome.
-#	ifdef __cvui_min
-#		define min __cvui_min
+#		ifdef __cvui_min
+#			define min __cvui_min
+#		endif
+#		ifdef __cvui_max
+#			define max __cvui_max
+#		endif
 #	endif
-#	ifdef __cvui_max
-#		define max __cvui_max
-#	endif
-#endif
 
 
 #endif // CVUI_IMPLEMENTATION

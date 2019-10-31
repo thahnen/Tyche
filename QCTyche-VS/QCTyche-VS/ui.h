@@ -66,7 +66,7 @@
  *	@param file_path		where to store the path
  *	@return					SUCCESS if the resolution matches the requirements otherwise an error
  *
- *	BUG: Wenn Speicherort vom Benutzer gewählt aber kein Bild unter dem Pfad gespeichert wurde
+ *	BUG: Wenn Speicherort vom Benutzer gewï¿½hlt aber kein Bild unter dem Pfad gespeichert wurde
  *	BUG: taucht die "Datei" trotzdem im Explorer unter "Zuletzt verwendete Dateien" auf!
  *
  *	TODO: Bug bei MS melden!
