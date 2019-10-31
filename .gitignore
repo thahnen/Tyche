@@ -16,4 +16,4 @@ QCTyche-VS/QCTyche-VS/Debug/
 QCTyche-VS/QCTyche-VS/Release/
 QCTyche-VS/QCTyche-VS/x64/
 
-install/Installer/mysetup.exe
+install/Installer/*.exe

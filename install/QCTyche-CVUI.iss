@@ -5,38 +5,64 @@
 
 ;   TODO: work on this script, it does not fully work and there are no icons etc.
 
+
+#define NAME            "QCTyche"
+#define VERSION         "1.0.0"
+#define PUBLISHER       "Tobias Hahnen, iPattern at University of Applied Sciences Niederrhein"
+#define URL             "https://github.com/thahnen/Tyche"
+#define OUTPUT_DIR      "C:\Users\Tobias Hahnen\GitHub\Tyche\install\Installer"
+#define OUTPUT_SUFFIX   "_setup_x64"
+#define MIN_NT_VERSION  "6.0"
+
+
 [Setup]
 AppId={{3379666D-69CC-4DB0-B1FD-01C082B05B80}
-AppName=QCTyche
-AppVersion=1.0
-AppVerName=QCTyche version 1.0
-AppPublisher=Tobias Hahnen, iPattern at University of Applied Sciences Niederrhein
-AppPublisherURL=https://github.com/thahnen/Tyche
-AppSupportURL=https://github.com/thahnen/Tyche
-AppUpdatesURL=https://github.com/thahnen/Tyche
-WizardStyle=modern
-DefaultDirName={pf}\QCTyche
-DefaultGroupName=QCTyche
+AppName={#NAME}
+AppVersion={#VERSION}
+AppVerName={#NAME} {#VERSION}
+AppPublisher={#PUBLISHER}
+AppPublisherURL={#URL}
+AppSupportURL={#URL}
+AppUpdatesURL={#URL}
+DefaultDirName={pf}\{#NAME}
+DefaultGroupName={#NAME}
 AllowNoIcons=yes
-OutputDir=C:\Users\Tobias Hahnen\GitHub\Tyche\install\Installer
+OutputDir={#OUTPUT_DIR}
+OutputBaseFilename={#NAME}{#VERSION}{#OUTPUT_SUFFIX}
 ArchitecturesAllowed=x64
 ArchitecturesInstallIn64BitMode=x64
 Compression=lzma2
 SolidCompression=yes
+MinVersion={#MIN_NT_VERSION}
+WizardStyle=modern
+WizardImageStretch=False
+WizardImageBackColor=clWhite
+;WizardImageFile=QCTyche_setup.bmp
+;WizardSmallImageFile=QCTyche_setup_icon.bmp
+
+
+[Languages]
+Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
+
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
+
 [Files]
 Source: "C:\Users\Tobias Hahnen\GitHub\Tyche\QCTyche-VS\x64\Release\QCTyche-VS.exe"; DestDir: "{app}"; DestName: "QCTyche.exe"; Flags: ignoreversion
 
+
+; TODO: not every menue item seems to work using Windows 10 (one even vanished when clicking it!)
 [Icons]
 Name: "{group}\QCTyche"; Filename: "{app}\QCTyche-VS.exe"
 Name: "{group}\{cm:ProgramOnTheWeb,QCTyche}"; Filename: "https://github.com/thahnen/Tyche"
 Name: "{group}\{cm:UninstallProgram,QCTyche}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\QCTyche"; Filename: "{app}\QCTyche.exe"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\QCTyche"; Filename: "{app}\QCTyche-VS.exe"; Tasks: quicklaunchicon
+
 
 [Run]
 Filename: "{app}\QCTyche.exe"; Description: {cm:LaunchProgram,QCTyche}; Flags: nowait postinstall skipifsilent
