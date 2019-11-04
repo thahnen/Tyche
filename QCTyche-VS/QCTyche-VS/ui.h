@@ -109,9 +109,6 @@ TSTATUS getFileSavePath(std::string& file_path) {
 					std::wstring wpath = path;
 					file_path = std::string(wpath.begin(), wpath.end());
 
-					// TODO: auskommentieren!
-					std::cout << "Dateipfad zum speichern: " << file_path << std::endl;
-
 					// Release item and return successfully
 					item->Release();
 					return SUCCESS;
@@ -144,7 +141,6 @@ TSTATUS getUserDesktopDirectory(std::string& file_path) {
 
 	return UI_HOME_DIRECTORY;
 }
-
 
 
 #pragma warning(push)
@@ -212,8 +208,6 @@ TSTATUS handleMouseInput(int x, int y, bool& displayDepth, bool& captureNew, cv:
 			});
 
 			path += filename;
-
-			std::cout << "Path: " << path << std::endl;
 		}
 
 		// 2) Save image to file using requested path

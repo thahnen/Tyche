@@ -113,7 +113,7 @@ cv::Mat CameraListener::getNewestDepthImage(int type) {
 		cv::convertScaleAbs(depthImage, conv, scale, (-min * scale));
 		break;
 	default:
-		log(ERROR, "CameraListerner::getNewestDepthImage - Given type not allowed!");
+		log(LERROR, "CameraListerner::getNewestDepthImage - Given type not allowed!");
 	}
 
 	return conv;
@@ -140,7 +140,7 @@ cv::Mat CameraListener::getNewestGrayscaleImage(int type) {
 		cv::convertScaleAbs(grayImage, conv, scale);
 		break;
 	default:
-		log(ERROR, "CameraListerner::getNewestGrayscaleImage - Given type not allowed!");
+		log(LERROR, "CameraListerner::getNewestGrayscaleImage - Given type not allowed!");
 	}
 
 	return conv;

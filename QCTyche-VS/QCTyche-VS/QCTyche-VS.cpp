@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
 	log(INFO, "Testing main monitor resolution.");
 	if ((stat = checkResolutionRequirements(WINDOW_WIDTH, WINDOW_HEIGHT)) != SUCCESS) {
 		// TODO: maybe create resolvable error?
-		log(ERROR, "Monitor resolution to low!");
+		log(LERROR, "Monitor resolution to low!");
 		handleTSTATUS(stat);
 		return 1;
 	}
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
 	///
 	log(INFO, "Starting UI.");
 	if ((stat = startUI(window)) != SUCCESS) {
-		log(ERROR, "Can not start UI!");
+		log(LERROR, "Can not start UI!");
 		handleTSTATUS(stat);
 		return 2;
 	}
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
 	/// Camera listener used for setting up the camera and handling the input every frame
 	/// The camera device which is representing the camera
 	CameraListener listener;
-	unique_ptr<royale::ICameraDevice> cameraDevice;
+	std::unique_ptr<royale::ICameraDevice> cameraDevice;
 
 
 	///	Try to request a camera until one is plugged in or the user cancels the application
@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 	log(INFO, "Configure camera.");
 	if ((stat = listener.configureCamera(cameraDevice)) != SUCCESS) {
 		// Camera settings can not be configured (error can not be recovered!)
-		log(ERROR, "Camera can not be configured!");
+		log(LERROR, "Camera can not be configured!");
 		handleTSTATUS(stat);
 		return 4;
 	}
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 	log(INFO, "Registering CameraListener.");
 	if (cameraDevice->registerDataListener(&listener) != royale::CameraStatus::SUCCESS) {
 		// Camera can not register listener to get images (error can not be recovered!)
-		log(ERROR, "Can not register CameraListener!");
+		log(LERROR, "Can not register CameraListener!");
 		handleTSTATUS(CD_REGISTER_LIST);
 		return 5;
 	}
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
 	log(INFO, "Camera starts image capturing.");
 	if (cameraDevice->startCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not start recording video (error can not be recovered!)
-		log(ERROR, "Camera can not start capturing images!");
+		log(LERROR, "Camera can not start capturing images!");
 		handleTSTATUS(CD_START_CAPTURE);
 		return 6;
 	}
@@ -218,7 +218,7 @@ int main(int argc, char** argv) {
 	log(INFO, "Camera stops image capturing.");
 	if (cameraDevice->stopCapture() != royale::CameraStatus::SUCCESS) {
 		// Camera can not stop recording images (not harmful as this happens at the end!)
-		log(ERROR, "Camera can not stop capturing images!");
+		log(LERROR, "Camera can not stop capturing images!");
 		handleTSTATUS(CD_STOP_CAPTURE);
 	}
 
@@ -288,7 +288,7 @@ TSTATUS startUI(cv::Mat& window) {
 		);
 	} catch (const std::exception& e) {
 		// TODO: log the error?
-		log(ERROR, "startUI - Error occured creating UI elements!");
+		log(LERROR, "startUI - Error occured creating UI elements!");
 		return UI_SETUP;
 	}
 

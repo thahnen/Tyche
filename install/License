@@ -1,0 +1,12 @@
+Copyright (C) 2019 University of Applied Sciences Niederrhein - All Rights Reserved
+
+This file is part of the QCTyche software created by the iPattern Institute of Pattern Recognition.
+Unauthorized copying of this file or the software, via any medium is strictly prohibited and can not
+be distributed without the express permission of the University of Applied Sciences Niederrhein
+representated by the iPattern Institute of Pattern Recognition.
+
+This software also uses the licenses of the following open source libraries:
+- OpenCV BSD License (https://opencv.org/license/)
+- CVUI MIT License (https://github.com/Dovyski/cvui/blob/master/LICENSE.md)
+
+Written by Tobias Hahnen <tobias.hahnen@stud.hn.de>, November 2019

@@ -1,15 +1,17 @@
 ;   -- QCTyche-CVUI.iss --
 ;   Script for creating an installer for the QCTyche software!
-;   The software uses OpenCV aswell as the picoflexx cameras' royale library.
-;   The program runs on 64-Bit Windows 7+
-
-;   TODO: work on this script, it does not fully work and there are no icons etc.
+;   The software uses OpenCV aswell as the pmd picoflexx cameras' royale library.
+;   The program runs on Windows 7/8/8.1/10 64-Bit.
+;
+;   INFORMATION: This uses the CVUI-"GUI" library, therefore the file name!
+;   INFORMATION: Do not change the AppId value under any circumstances!
 
 
 #define NAME            "QCTyche"
 #define VERSION         "1.0.0"
 #define PUBLISHER       "Tobias Hahnen, iPattern at University of Applied Sciences Niederrhein"
 #define URL             "https://github.com/thahnen/Tyche"
+#define LICENSE_PATH    "C:\Users\Tobias Hahnen\GitHub\Tyche\install\License"
 #define OUTPUT_DIR      "C:\Users\Tobias Hahnen\GitHub\Tyche\install\Installer"
 #define OUTPUT_SUFFIX   "_setup_x64"
 #define MIN_NT_VERSION  "6.0"
@@ -34,6 +36,7 @@ ArchitecturesInstallIn64BitMode=x64
 Compression=lzma2
 SolidCompression=yes
 MinVersion={#MIN_NT_VERSION}
+LicenseFile={#LICENSE_PATH}
 WizardStyle=modern
 WizardImageStretch=False
 WizardImageBackColor=clWhite
@@ -53,6 +56,8 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 Source: "C:\Users\Tobias Hahnen\GitHub\Tyche\QCTyche-VS\x64\Release\QCTyche-VS.exe"; DestDir: "{app}"; DestName: "QCTyche.exe"; Flags: ignoreversion
+Source: "C:\Users\Tobias Hahnen\GitHub\Tyche\QCTyche-VS\QCTyche-VS\testbild.png"; DestDir: "{app}"; DestName: "testbild.png"; Flags: ignoreversion
+Source: {#LICENSE_PATH}; DestDir: "{app}"; DestName: "License"; Flags: ignoreversion
 
 
 ; TODO: not every menue item seems to work using Windows 10 (one even vanished when clicking it!)

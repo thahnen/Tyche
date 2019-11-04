@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClCompile Include="CameraListener.cpp" />
     <ClCompile Include="FileHandler.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="QCTyche-VS.cpp" />
     <ClCompile Include="Status.cpp" />
   </ItemGroup>

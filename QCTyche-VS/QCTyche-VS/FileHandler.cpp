@@ -1,6 +1,7 @@
 #include <Windows.h>
 
 #include "FileHandler.h"
+#include "Logger.h"
 
 
 /// Saves a OpenCV matrix to disk (as an image and as a YML file)
@@ -11,12 +12,14 @@ TSTATUS saveMatrix(const std::string& path, const cv::Mat& img, const cv::Mat& m
 		return FH_SAVE_IMAGE;
 	}
 
+	log(INFO, std::string("Image written to: ") + path);
+
 
 	// 2) Save float matrix
 	std::string tpath = path;
 	tpath.replace(tpath.find(".png", 0), 4, ".yml");
 
-	std::cout << tpath << std::endl;
+	log(INFO, std::string("Matrix written to: ") + tpath);
 
 	try {
 		cv::FileStorage file(tpath, cv::FileStorage::WRITE);
